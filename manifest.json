@@ -1,0 +1,46 @@
+{
+  "name": "扇贝助手v2",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "description": "任意网页查询并加入生词本、背单词页面简洁、增加实用快捷键",
+  "icons": {
+    "48": "images/m.png"
+  },
+  "background": {
+    "scripts": [
+      "js/background.js"
+    ],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_icon": "images/m.png",
+    "default_popup": "popup.html",
+    "default_title": "扇贝助手增强版"
+  },
+  "content_scripts": [
+    {
+      "css": [
+        "css/popup.css"
+      ],
+      "js": [
+        "js/const.js",
+        "js/main.js"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "permissions": [
+    "cookies",
+    "contextMenus",
+    "activeTab",
+    "tabs",
+    "storage",
+    "notifications",
+    "*://*/*",
+    "\u003Call_urls\u003E"
+  ],
+  "web_accessible_resources": [
+    "images/m.png"
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval' ; object-src 'self'"
+}
