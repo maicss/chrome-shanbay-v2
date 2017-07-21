@@ -4,6 +4,17 @@ const debugLogger = (level = 'log', ...msg) => {
   if (devMode) console[level](...msg)
 }
 
+const request = (url, options) => {
+  return fetch(url, options).then(res => {
+    if (res.ok) {
+      return res.json()
+    } else {
+      debugLogger('error', `[${new Date().toLocaleDateString()}] request failed ${options.method} ${url} ${JSON.stringify(res)}`)
+      return Promise.reject(res)
+    }
+  }).catch(e => debugLogger('error', `[${new Date().toLocaleDateString()}] fetch failed ${options.method} ${url} ${JSON.stringify(e)}`))
+}
+
 const shanbayAPI = {
   userInfo: {
     method: 'GET',
