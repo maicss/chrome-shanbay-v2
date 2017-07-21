@@ -22,6 +22,7 @@ function renderUser() {
     logout.onclick = function () {
       bg.oauth.clearToken();
       delete bg.User;
+      notify('Authorized info', `Deauthorize successfully.`)
       window.close();
     }
     headerImg.src = user.avatar.replace('128w_128h', '80w_80h');
@@ -44,7 +45,10 @@ function renderUser() {
   if (bg.oauth.token_valid()) {
     const account_api = bg.oauth.conf.api_root + '/account/?access_token=' + bg.oauth.access_token();
     // makeRequest('GET', account_api, null, callback);
-    request(account_api).then(d => callback(d))
+    request(account_api).then(userInfo => {
+      notify('Authorized info', `Authorize successfully, name: ${userInfo.username}`, `http://www.shanbay.com/user/list/${userInfo.username}`)
+      callback(userInfo)
+    })
   } else {
     chrome.runtime.sendMessage({
       action: 'authorize'
@@ -55,11 +59,17 @@ function renderUser() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  const authBtn = document.querySelector('#authorization')
-
   renderUser();
-
-  authBtn.onclick = function () {
+  document.querySelector('#authorization').onclick = function () {
     renderUser();
+  }
+  document.querySelector('#batch-add').onclick = function () {
+    chrome.tabs.create({url: 'http://www.shanbay.com/bdc/vocabulary/add/batch/'})
+  }
+  document.querySelector('#begin-learning').onclick = function () {
+    chrome.tabs.create({url: 'http://www.shanbay.com/bdc/review/'})
+  }
+  document.querySelector('#options').onclick = function () {
+    chrome.tabs.create({url: 'options.html'})
   }
 });

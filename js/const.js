@@ -4,6 +4,28 @@ const debugLogger = (level = 'log', ...msg) => {
   if (devMode) console[level](...msg)
 }
 
+const notify = (title='人丑多读书', message='少壮不努力，老大背单词', url='https://www.shanbay.com/') => {
+  let hasNotified = false
+  const options = {
+    type: 'basic',
+    title, message,
+    iconUrl: '../images/icon_48.png'
+  }
+  let noteID = Math.random().toString(36)
+  chrome.notifications.create(noteID, options, (notifyID) => {
+    console.log(`notification [${notifyID}] was created`)
+    hasNotified = true
+  })
+  chrome.notifications.onClicked.addListener (function (notifyID) {
+    console.log(`notification [${notifyID}] was clicked`)
+    chrome.notifications.clear(notifyID)
+    if (noteID === notifyID) {
+      chrome.tabs.create({url})
+    }
+    hasNotified = false
+  })
+}
+
 const request = (url, options) => {
   if (options) {
     options.method = options.method || 'GET'
