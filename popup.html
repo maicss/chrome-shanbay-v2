@@ -11,16 +11,36 @@
         li {
             list-style-type: none;
             white-space: nowrap;
-            margin: 10px;
-            padding: 6px 12px;
-            border-radius: 4px;
-            background: #209e85;
+            margin: 10px 0;
             text-align: center;
         }
 
+        button {
+            background: #209e85;
+            padding: 0;
+            border-radius: 4px;
+            border: none;
+            width: 80px;
+            height:26px;
+            color: #fff;
+            user-select: none;
+            outline: none;
+            cursor: pointer;
+        }
+        #header {
+            cursor: pointer;
+            text-align: center;
+        }
+        #header img {
+            width: 40px;
+            height:40px;
+            vertical-align: top;
+            border: 1px solid #000;
+        }
+        .hide {
+            display: none;
+        }
         a {
-            color: #ffffff;
-            text-decoration: none;
             outline: none;
         }
 
@@ -28,10 +48,12 @@
 </head>
 <body>
 <div>
+    <div id="header" class="hide"><a href=""><img src="images/default_head.png"></a></div>
     <ul>
-        <li><a href="javascript:void(0)" id="batch-add">批量添加单词</a></li>
-        <li><a href="javascript:void(0)" id="begin-learning">开始背单词</a></li>
-        <li><a href="javascript:void(0)" id="options">高级设置</a></li>
+        <li><button id="authorization">授权</button></li>
+        <li><button id="batch-add">批量添加单词</button></li>
+        <li><button id="begin-learning">开始背单词</button></li>
+        <li><button id="options">高级设置</button></li>
     </ul>
 </div>
 <!--   <input type="button" id="batch-add" value="">

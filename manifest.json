@@ -8,6 +8,8 @@
   },
   "background": {
     "scripts": [
+      "lib/config.js",
+      "lib/shanbay_oauth2.js",
       "js/background.js"
     ],
     "persistent": false
@@ -36,8 +38,7 @@
     "tabs",
     "storage",
     "notifications",
-    "*://*/*",
-    "\u003Call_urls\u003E"
+    "*://*/*"
   ],
   "web_accessible_resources": [
     "images/m.png"

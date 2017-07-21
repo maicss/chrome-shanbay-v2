@@ -69,6 +69,7 @@ const popover = (data) => {
     'id': 7621,
     'retention': 0
   }
+  // https://www.shanbay.com/review/learning/51385412119
 
   // 先获取到弹窗应该出现的位置
   let html = ''
@@ -86,7 +87,7 @@ const popover = (data) => {
   <div class="popover-inner">
         <div class="popover-title">
             <span class="word">${data.content}</span>
-            <a href="/review/learning/51349388842" style="float: right; margin-top: 12px;" target="_blank"> 详细</a>
+            <a href="https://www.shanbay.com/review/learning/${data.learning_id}" style="float: right; margin-top: 12px;" target="_blank"> 详细</a>
             <div>
                 <span>us:</span><small>${data.pronunciations.us}</small>
                 <span class="speaker" data-target="us"><i class="icon-volume-off"></i></span>
@@ -97,8 +98,8 @@ const popover = (data) => {
         <div class="popover-content">
             <div class="simple-definition" style="margin-bottom: 20px; font-size: 16px;">
                 ${data.definitions.cn.map(def => {
-                  return `<div><span>${def.pos}</span><span> ${def.defn}</span></div>`
-                })}
+                  return `<div><span>${def.pos}</span><span>${def.defn}</span></div>`
+                }).join('')}
             </div>
             <div class="add">
                 <p><button class="forget pull-right btn btn-success">我忘了</button></p>
