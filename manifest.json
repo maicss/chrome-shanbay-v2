@@ -12,7 +12,7 @@
       "lib/shanbay_oauth2.js",
       "js/background.js"
     ],
-    "persistent": false
+    "persistent": true
   },
   "browser_action": {
     "default_icon": "images/m.png",

@@ -5,6 +5,9 @@ const debugLogger = (level = 'log', ...msg) => {
 }
 
 const request = (url, options) => {
+  if (options) {
+    options.method = options.method || 'GET'
+  }
   return fetch(url, options).then(res => {
     if (res.ok) {
       return res.json()

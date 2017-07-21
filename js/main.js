@@ -1,10 +1,6 @@
 let selectionParentBody = null
 let offset = null
 
-// todo: 先不管箭头了，测试网页各个角落的单词
-// todo 测试线上查询
-// todo 弄Oauth
-
 const pendingSearchSelection = (e) => {
   /**
    * 双击事件的监听器。
@@ -103,7 +99,6 @@ const popover = (data) => {
             </div>
             <div class="add">
                 <p><button class="forget pull-right btn btn-success">我忘了</button></p>
-
                  <p style="text-align: right;">
                      <button id="add-word" class="btn btn-success">添加</button>
                  </p>
@@ -132,7 +127,7 @@ const getSelectionPosition = (range) => {
   let {left, top, height, width} = range.getBoundingClientRect()
   // left += width / 2
   // 这里的22px是为了和单词保持一定距离
-  top += (height)
+  top += height
   return {left, top}
 }
 

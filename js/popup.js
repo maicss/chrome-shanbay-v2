@@ -1,54 +1,65 @@
-function makeRequest(method, url, data, callback){
-  console.log('request url', url);
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function(){
-    if (xhr.readyState == 4){
-      callback(JSON.parse(xhr.responseText));
-    }
-  };
-  xhr.open(method, url, true);
-  xhr.send(data);
-}
+var bg = chrome.extension.getBackgroundPage()
 
-function renderUser(){
-  function callback(user){
-    var user_link = document.getElementById('home');
-    user_link.href = 'http://www.shanbay.com/user/list/'+user.username;
-    user_link.onclick=function(){
-      chrome.tabs.create({url:this.href})
+function renderUser() {
+
+  function callback(user) {
+    // todo: 通知授权成功
+    var header = document.querySelector('#header')
+    var batchAddBtn = document.querySelector('#batch-add')
+    var learnBtn = document.querySelector('#begin-learning')
+    var settingBtn = document.querySelector('#options')
+    var logout = document.querySelector('#logout')
+
+    var headerImg = header.querySelector('img');
+    var userLink = header.querySelector('a');
+    userLink.href = 'http://www.shanbay.com/user/list/' + user.username;
+    userLink.onclick = function () {
+      chrome.tabs.create({
+        url: this.href
+      })
     };
 
-    document.getElementById('logout').onclick = function(){
+    logout.onclick = function () {
       bg.oauth.clearToken();
       delete bg.User;
       window.close();
     }
-
-    var img = document.getElementById('avatar');
-    img.src = user.avatar.replace('128w_128h', '80w_80h');
-
-    var nickname = document.getElementById('nickname');
-    nickname.innerText = user.nickname;
+    headerImg.src = user.avatar.replace('128w_128h', '80w_80h');
+    // 显示头像、菜单和退出，隐藏授权按钮
+    header.classList = ''
+    document.querySelector('#authorization').classList = 'hide'
+    batchAddBtn.classList = ''
+    learnBtn.classList = ''
+    settingBtn.classList = ''
+    logout.classList = ''
     bg.User = user;
   }
 
-  const bg = chrome.extension.getBackgroundPage();
-  console.log('bg: ', bg)
-  if (bg.User){
+
+  if (bg.User) {
     callback(bg.User);
     return;
   }
 
-  if (bg.oauth.token_valid()){
+  if (bg.oauth.token_valid()) {
     const account_api = bg.oauth.conf.api_root + '/account/?access_token=' + bg.oauth.access_token();
-    makeRequest('GET', account_api, null, callback);
+    // makeRequest('GET', account_api, null, callback);
+    request(account_api).then(d => callback(d))
   } else {
-    // chrome.runtime.sendMessage({action:'authorize'}, function(){
-    //   renderUser();
-    // })
+    chrome.runtime.sendMessage({
+      action: 'authorize'
+    }, function () {
+      renderUser();
+    })
   }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  const authBtn = document.querySelector('#authorization')
+
   renderUser();
+
+  authBtn.onclick = function () {
+    renderUser();
+  }
 });
