@@ -4,11 +4,12 @@ const debugLogger = (level = 'log', ...msg) => {
   if (devMode) console[level](...msg)
 }
 
-const notify = (title='人丑多读书', message='少壮不努力，老大背单词', url='https://www.shanbay.com/') => {
+const notify = (title = '人丑多读书', message = '少壮不努力，老大背单词', url = 'https://www.shanbay.com/') => {
   let hasNotified = false
   const options = {
     type: 'basic',
-    title, message,
+    title,
+    message,
     iconUrl: '../images/icon_48.png'
   }
   let noteID = Math.random().toString(36)
@@ -16,11 +17,13 @@ const notify = (title='人丑多读书', message='少壮不努力，老大背单
     console.log(`notification [${notifyID}] was created`)
     hasNotified = true
   })
-  chrome.notifications.onClicked.addListener (function (notifyID) {
+  chrome.notifications.onClicked.addListener(function (notifyID) {
     console.log(`notification [${notifyID}] was clicked`)
     chrome.notifications.clear(notifyID)
     if (noteID === notifyID) {
-      chrome.tabs.create({url})
+      chrome.tabs.create({
+        url
+      })
     }
     hasNotified = false
   })
@@ -43,7 +46,7 @@ const request = (url, options) => {
 const shanbayAPI = {
   userInfo: {
     method: 'GET',
-    url: 'https://api.shanbay.com/account/'
+    url: 'https://api.shanbay.com/account/?access_token='
   },
   lookUp: {
     method: 'GET',
@@ -52,31 +55,40 @@ const shanbayAPI = {
   },
   add: {
     method: 'POST',
-    url: 'https://api.shanbay.com/bdc/learning/',
+    url: 'https://api.shanbay.com/bdc/learning/?access_token=',
     params: ['id']
   },
   forget: {
     method: 'PUT',
-    url: ' https://api.shanbay.com/bdc/learning/{learning_id}/',
+    url: ' https://api.shanbay.com/bdc/learning/{learning_id}/?access_token=',
     params: [{forget: 1}]
   }
 }
 
-const localStorageSpecification = {
-  click2find: {
-    desc: '双击选中之后是否直接查询',
-    default: true
-  },
-  defaultAddBook: {
-    desc: '默认是否直接加入单词本',
-    default: false
-  },
-  defaultPronounce: {
-    desc: '是否默认查询时候发音',
-    default: false,
-    values: ['EN', 'US', false]
-  }
-}
+/**
+ * localStorageSpecification 存放到localStorage的配置
+ * 只存取第一个键值对
+ * desc 是这个键值对的描述
+ * enum 是这个键的取值范围
+ * */
+const localStorageSpecification = [
+  {'content-etyma': false, desc: '是否显示词根', enum: [true, false]},
+  {'content-derivate': false, desc: '是否显示派生词', enum: [true, false]},
+  {'content-sentence': false, desc: '是否显示例句', enum: [true, false]},
+  {'content-note': false, desc: '是否显示笔记', enum: [true, false]},
+  {'clickLookup': true, desc: '双击选中查词', enum: [true, false]},
+  {'contextLookup': true, desc: '右键查词', enum: [true, false]},
+  {'addBook': false, desc: '默认添加到单词本', enum: [true, false]},
+  {'deformation': false, desc: '默认显示单词变形', enum: [true, false]},
+  {'commonPhrase': false, desc: '默认显示常用短语', enum: [true, false]},
+  {'alarm': true, desc: '定时提醒', enum: [true, false]},
+  {'reminderContent': '少壮不努力，老大背单词', desc: '提示框内容',},
+  {'syllabification': true, desc: '默认显示音节划分', enum: [true, false]},
+  {'autoRead': 'false', desc: '自动发音', enum: ['EN', 'US', 'false']},
+  {'paraphrase': 'bilingual', desc: '默认释义', enum: ['Chinese', 'English', 'bilingual']}
+]
+
+const localStorageSettings = localStorageSpecification.map(setting => {delete setting.enum;delete setting.desc; return setting})
 
 /**
  * 构造所有需要跟shanbay交互的方法
@@ -102,7 +114,12 @@ const lookUp = (word) => {
   }).catch(e => (debugLogger('error', e)))
 }
 const add = (id) => {
-  return fetch(shanbayAPI.add.url, {method: shanbayAPI.add.method, body: {id}}).then(res => {
+  return fetch(shanbayAPI.add.url, {
+    method: shanbayAPI.add.method,
+    body: {
+      id
+    }
+  }).then(res => {
     if (res.ok) {
       return res.json()
     } else {
@@ -111,7 +128,12 @@ const add = (id) => {
   }).catch(e => (debugLogger('error', e)))
 }
 const forget = (id) => {
-  return fetch(shanbayAPI.forget.url, {method: shanbayAPI.forget.method, body: {id}}).then(res => {
+  return fetch(shanbayAPI.forget.url, {
+    method: shanbayAPI.forget.method,
+    body: {
+      id
+    }
+  }).then(res => {
     if (res.ok) {
       return res.json()
     } else {

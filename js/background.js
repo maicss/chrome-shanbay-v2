@@ -5,12 +5,17 @@
 
 // todo 添加双击选中
 
-var oauth = ShanbayOauth.initPage();
+var oauth = ShanbayOauth.initPage()
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendReponse){
-    if (request.action === 'authorize'){
-        oauth.authorize(sendReponse);
-    }
+chrome.runtime.onMessage.addListener(function (req, sender, sendReponse) {
+  switch (req.action) {
+    case 'authorize':
+      oauth.authorize(sendReponse)
+      break
+    case 'wordLookup':
+      console.log('const request: ', request)
+      console.log('action wordLookup, data: ', req.data)
+  }
 })
 // todo 添加options页面
 

@@ -1,15 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Shanbay Chrome Settings</title>
-
+    <link href="css/options.css" type="text/css" rel="stylesheet"/>
 </head>
+
 <body>
-http://materializecss.com/buttons.html
-components:
-1, buttons
-2, form
-3,
+<div id="main">
+    <header>
+        <h1>扇贝助手设置</h1>
+    </header>
+    <hr>
+    <ul>
+        <li>
+            <h3>弹出框显示内容</h3>
+            <p>
+                <label>
+                    <input type="checkbox" name="content-etyma" value="content-etyma">词根
+                </label>
+                <label>
+                    <input type="checkbox" name="content-derivate" value="content-derivate">词汇派生
+                </label>
+                <label>
+                    <input type="checkbox" name="content-sentence" value="content-sentence">例句
+                </label>
+                <label>
+                    <input type="checkbox" name="content-note" value="content-note">笔记
+                </label>
+            </p>
+        </li>
+        <li>
+            <h3>查词的两种方式：</h3>
+            <h3>1，双击查词</h3>
+            <p>
+                <label>
+                    <input type="radio" name="clickLookup" value="true" checked>是
+                    <input type="radio" name="clickLookup" value="false">否
+                </label>
+            </p>
+            <h3>2，右键菜单查词(重启Chrome才能生效)</h3>
+            <p>
+                <label>
+                    <input type="radio" name="contextLookup" value="true" checked>是
+                    <input type="radio" name="contextLookup" value="false">否
+                </label>
+            </p>
+        </li>
+        <li>
+            <h3>默认加入生词库</h3>
+            <p>
+                <label>
+                    <input type="radio" name="addBook" value="true">是
+                    <input type="radio" name="addBook" value="false" checked>否
+                </label>
+            </p>
+
+        </li>
+        <li>
+            <h3>显示单词变形</h3>
+            <p>
+                <label>
+                    <input type="radio" name="deformation" value="true">是
+                    <input type="radio" name="deformation" value="false" checked>否
+                </label>
+            </p>
+
+        </li>
+        <li>
+            <h3>显示常用短语</h3>
+            <p>
+                <label>
+                    <input type="radio" name="commonPhrase" value="true">是
+                    <input type="radio" name="commonPhrase" value="false" checked>否
+                </label>
+            </p>
+        </li>
+        <li>
+            <h3>默认发音</h3>
+            <p class="select">
+                <select name="autoRead">
+                    <option value="US">美音</option>
+                    <option value="EN">英音</option>
+                    <option selected value="false">关闭</option>
+                </select>
+            </p>
+        </li>
+        <li>
+            <h3>释义</h3>
+            <p class="select">
+                <select name="paraphrase">
+                    <option value="Chinese">只显示中文释义</option>
+                    <option value="English">只显示英文释义</option>
+                    <option selected value="bilingual">显示双语释义</option>
+                </select>
+            </p>
+        </li>
+        <li>
+            <h3>开启背单词定时提醒(每3小时)</h3>
+            <p>
+                <label>
+                    <input type="radio" name="alarm" value="true" checked>是
+                    <input type="radio" name="alarm" value="false">否
+                </label>
+            </p>
+            <p><strong>提醒内容定制: </strong><input type="text" name="reminderContent" value="少壮不努力，老大背单词"></p>
+
+        </li>
+        <li>
+            <h3>显示音节划分</h3>
+            <p>
+                <label>
+                    <input type="radio" name="syllabification" value="true" checked>是
+                    <input type="radio" name="syllabification" value="false">否
+                </label>
+            </p>
+        </li>
+    </ul>
+
+    <p id="saveP">
+        <button id="save">保存</button>
+    </p>
+
+    <hr>
+
+    <h3>关于</h3>
+    <p>这个应用是基于<a href="https://github.com/jinntrance/shanbay-crx">jinntrance</a>的扇贝查词应用做的。</p>
+    <p>改进的动力：第一代码（我是专职前端，但是是野生的，jinntrance比我强太多了）；第二扇贝API升级了，并把之前的API标记为废弃了；第三我想做个扩展玩玩。</p>
+    <p>本项目的<a href="https://github.com/maicss/chrome-shanbay-v2"> GitHub</a>地址。感觉有帮助的话给个赞，嗯嗯。</p>
+    <h3>反馈</h3>
+    <p>反馈有两种方式：邮件和GitHub issue。建议使用GitHub。</p>
+    <p>1, 本人<a href="mailto:maicss@foxmail.com?subject=Chrome-shanbay-extension-issue">邮箱</a></p>
+    <p>如果电脑上有邮箱应用并添加了邮箱账号，可以直接点击，主题为也已经在链接里写好了。如果没有，主题一定要写成“Chrome-shanbay-extension-issue”。
+    </p>
+    <p>
+        ⚠️邮件内容一定要包括：操作系统的名称、版本，chrome的名称（有正式版，开发版，金丝雀版等等）、版本号。尽量描述清楚问题出现的原因，最好有配图，GIF最好^ _ ^，因为我不可能说：“算了，我自己看看你的浏览器吧”。</p>
+    <p>2, <a href="https://github.com/maicss/chrome-shanbay-v2/issues">GitHub issue</a></p>
+    <p>issue的内容也尽量按照上面的来，我就不再说一遍了。这样我方便找问题解决问题，你也能尽快得到一个更好的插件。</p>
+    <p>最后，祝你们插件用得愉快，英语进步快，不要像我，<strong>老大背单词(╯°□°）╯︵ ┻━┻。</strong></p>
+</div>
+<script src="js/const.js"></script>
+<script src="js/options.js"></script>
 </body>
+
 </html>

@@ -1,17 +1,16 @@
-var bg = chrome.extension.getBackgroundPage()
+const bg = chrome.extension.getBackgroundPage()
 
 function renderUser() {
 
   function callback(user) {
-    // todo: 通知授权成功
-    var header = document.querySelector('#header')
-    var batchAddBtn = document.querySelector('#batch-add')
-    var learnBtn = document.querySelector('#begin-learning')
-    var settingBtn = document.querySelector('#options')
-    var logout = document.querySelector('#logout')
+    const header = document.querySelector('#header')
+    const batchAddBtn = document.querySelector('#batch-add')
+    const learnBtn = document.querySelector('#begin-learning')
+    const settingBtn = document.querySelector('#options')
+    const logout = document.querySelector('#logout')
 
-    var headerImg = header.querySelector('img');
-    var userLink = header.querySelector('a');
+    const headerImg = header.querySelector('img');
+    const userLink = header.querySelector('a');
     userLink.href = 'http://www.shanbay.com/user/list/' + user.username;
     userLink.onclick = function () {
       chrome.tabs.create({
@@ -43,9 +42,9 @@ function renderUser() {
   }
 
   if (bg.oauth.token_valid()) {
-    const account_api = bg.oauth.conf.api_root + '/account/?access_token=' + bg.oauth.access_token();
-    // makeRequest('GET', account_api, null, callback);
+    const account_api = shanbayAPI.UserInfo.url + bg.oauth.access_token();
     request(account_api).then(userInfo => {
+      // todo 这个提醒放在这里还是不对
       notify('Authorized info', `Authorize successfully, name: ${userInfo.username}`, `http://www.shanbay.com/user/list/${userInfo.username}`)
       callback(userInfo)
     })

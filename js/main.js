@@ -10,21 +10,21 @@ const pendingSearchSelection = (e) => {
    * */
   selectionParentBody = e.target.getRootNode().body
   offset = getSelectionPosition(getSelection().getRangeAt(0))
-  console.group('test')
-  console.log('range: ', offset)
-  console.log('client: ', e.clientX, e.clientY)
-  console.log('layer: ', e.layerX, e.layerY)
-  console.log('movement: ', e.movementX, e.movementY)
-  console.log('page: ', e.pageX, e.pageY)
-  console.log('screen: ', e.screenX, e.screenY)
-  console.groupEnd('test')
+  // console.group('test')
+  // console.log('range: ', offset)
+  // console.log('client: ', e.clientX, e.clientY)
+  // console.log('layer: ', e.layerX, e.layerY)
+  // console.log('movement: ', e.movementX, e.movementY)
+  // console.log('page: ', e.pageX, e.pageY)
+  // console.log('screen: ', e.screenX, e.screenY)
+  // console.groupEnd('test')
   // offset = {left: e.screenX, top: e.screenY}
   let matchResult = getSelection().toString().trim().match(/^[a-zA-Z\s']+$/)
-  if (matchResult && !localStorage['click2find']) {
-    // chrome.runtime.sendMessgae({
-    //   method: 'wordLookup',
-    //   data: matchResult[0]
-    // })
+  if (matchResult) {
+    chrome.runtime.sendMessage({
+      action: 'wordLookup',
+      data: matchResult[0]
+    })
     popover({
       loading: true,
       msg: '查询中....（请确保已登录扇贝网）'
@@ -65,20 +65,14 @@ const popover = (data) => {
     'id': 7621,
     'retention': 0
   }
-  // https://www.shanbay.com/review/learning/51385412119
 
   // 先获取到弹窗应该出现的位置
   let html = ''
   if (data.loading) {
     // 查询之前的提示
-    html = `
-<div id="shanbay-popover" style="top: ${offset.top}; left: ${offset.left}; display: block" class="fade bottom in popover">
-    <div class="popover-title">${data.msg}</div>
-</div>
-    `
+    html = `<div class="popover-title">${data.msg}</div>`
   } else {
     html = `
-  <div id="shanbay-popover" style="top: ${offset.top}px; left: ${offset.left}px; display: block" class="fade in bottom popover">
   <div class="arrow"></div>
   <div class="popover-inner">
         <div class="popover-title">
@@ -98,17 +92,15 @@ const popover = (data) => {
                 }).join('')}
             </div>
             <div class="add">
-                <p><button class="forget pull-right btn btn-success">我忘了</button></p>
-                 <p style="text-align: right;">
-                     <button id="add-word" class="btn btn-success">添加</button>
-                 </p>
+                ${data.learning_id ? `<p><button class="forget pull-right btn btn-success">我忘了</button></p>` : `<p style="text-align: right;"><button id="add-word" class="btn btn-success">添加</button></p>`}
                 <p style="text-align: right;"><span class="loading hide">&nbsp; &nbsp; 正在添加</span></p>
             </div>
             <div class="word-added hide"><p style="font-size: 14px; text-align: right"> 成功添加进你的词库</div>
         </div>
     </div>
-</div>
   `
+
+  html = `<div id="shanbay-popover" style="top: ${offset.top}; left: ${offset.left}; display: block" class="fade bottom in popover"> ${html}</div>`
     // 查询结果的处理
     /*
      * 1，查询到的是新生词

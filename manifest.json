@@ -8,6 +8,7 @@
   },
   "background": {
     "scripts": [
+      "js/const.js",
       "lib/config.js",
       "lib/shanbay_oauth2.js",
       "js/background.js"
