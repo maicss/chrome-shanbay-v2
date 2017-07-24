@@ -42,7 +42,7 @@ function renderUser() {
   }
 
   if (bg.oauth.token_valid()) {
-    const account_api = shanbayAPI.UserInfo.url + bg.oauth.access_token();
+    const account_api = shanbayAPI.userInfo.url + bg.oauth.access_token();
     request(account_api).then(userInfo => {
       // todo 这个提醒放在这里还是不对
       notify('Authorized info', `Authorize successfully, name: ${userInfo.username}`, `http://www.shanbay.com/user/list/${userInfo.username}`)

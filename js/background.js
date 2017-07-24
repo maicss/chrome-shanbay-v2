@@ -15,6 +15,7 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendReponse) {
     case 'wordLookup':
       console.log('const request: ', request)
       console.log('action wordLookup, data: ', req.data)
+      request(shanbayAPI.lookUp.url + req.data).then(res => sendReponse(res))
   }
 })
 // todo 添加options页面

@@ -1,4 +1,5 @@
 // todo save localStorage to background
+// todo 测试用户未登录的状况
 const renderOptions = (settings) => {
   settings.forEach(setting => {
     let name = Object.keys(setting)[0]

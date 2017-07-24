@@ -1,5 +1,6 @@
 let selectionParentBody = null
 let offset = null
+let storage = null
 
 const pendingSearchSelection = (e) => {
   /**
@@ -21,57 +22,70 @@ const pendingSearchSelection = (e) => {
   // offset = {left: e.screenX, top: e.screenY}
   let matchResult = getSelection().toString().trim().match(/^[a-zA-Z\s']+$/)
   if (matchResult) {
-    chrome.runtime.sendMessage({
-      action: 'wordLookup',
-      data: matchResult[0]
-    })
     popover({
       loading: true,
       msg: '查询中....（请确保已登录扇贝网）'
     })
+    request(shanbayAPI.lookUp.url + matchResult[0]).then(res => popover(res))
+    // chrome.runtime.sendMessage({
+    //   action: 'wordLookup',
+    //   data: matchResult[0]
+    // }, res => popover(res))
   }
 }
 
-const popover = (data) => {
+const popover = (res) => {
   /**
    * 弹出层逻辑处理器
    * @param data 需要弹出的数据和状态
    * */
 
-  data = {
-    'pronunciations': {'uk': '\'d\u0292eli', 'us': '\'d\u0292eli'},
-    'audio_addresses': {
-      'uk': ['https://media-audio1.baydn.com/uk%2Fj%2Fje%2Fjelly_v3.mp3', 'http://media-audio1.qiniu.baydn.com/uk/j/je/jelly_v3.mp3'],
-      'us': ['https://media-audio1.baydn.com/us%2Fj%2Fje%2Fjelly_v3.mp3', 'http://media-audio1.qiniu.baydn.com/us/j/je/jelly_v3.mp3']
-    },
-    'url': 'https://www.shanbay.com/bdc/mobile/preview/word?word=jelly',
-    'audio_name': 'jelly_v3',
-    'learning_id': 51385412119,
-    'content': 'jelly',
-    'target_retention': 5,
-    'num_sense': 2,
-    'definitions': {
-      'en': [
-        {'pos': 'n.', 'defn': 'an edible jelly (sweet or pungent) made with gelatin and used as a dessert or salad base or a coating for foods'},
-        {'pos': 'v.', 'defn': 'make into jelly'}
-      ],
-      'cn': [
-        {'pos': 'n.', 'defn': '\u679c\u51bb,\u51bb\u72b6\u7269,\u7ea0\u7ed3'},
-        {'pos': 'vi.', 'defn': '\u7ed3\u51bb,\u505a\u679c\u51bb'},
-        {'pos': 'vt.', 'defn': '\u4f7f\u50cf\u679c\u51bb\u4e00\u6837'}
-      ]
-    },
-    'sense_id': 0,
-    'id': 7621,
-    'retention': 0
+  let _data = {
+    'msg': 'SUCCESS',
+    'status_code': 0,
+    'data': {
+      'pronunciations': {'uk': '\'d\u0292eli', 'us': '\'d\u0292eli'},
+      'en_definitions': {
+        'v': ['make into jelly'],
+        'n': ['an edible jelly (sweet or pungent) made with gelatin and used as a dessert or salad base or a coating for foods', 'a preserve made of the jelled juice of fruit', 'any substance having the consistency of jelly or gelatin']
+      },
+      'audio_addresses': {
+        'uk': ['https://media-audio1.baydn.com/uk%2Fj%2Fje%2Fjelly_v3.mp3', 'http://media-audio1.qiniu.baydn.com/uk/j/je/jelly_v3.mp3'],
+        'us': ['https://media-audio1.baydn.com/us%2Fj%2Fje%2Fjelly_v3.mp3', 'http://media-audio1.qiniu.baydn.com/us/j/je/jelly_v3.mp3']
+      },
+      'uk_audio': 'http://media.shanbay.com/audio/uk/jelly.mp3',
+      'conent_id': 7621,
+      'audio_name': 'jelly_v3',
+      'cn_definition': {
+        'pos': '',
+        'defn': 'n. \u679c\u51bb,\u51bb\u72b6\u7269,\u7ea0\u7ed3\nvi. \u7ed3\u51bb,\u505a\u679c\u51bb\nvt. \u4f7f\u50cf\u679c\u51bb\u4e00\u6837'
+      },
+      'num_sense': 1,
+      'content_type': 'vocabulary',
+      'sense_id': 0,
+      'id': 7621,
+      'definition': ' n. \u679c\u51bb,\u51bb\u72b6\u7269,\u7ea0\u7ed3\nvi. \u7ed3\u51bb,\u505a\u679c\u51bb\nvt. \u4f7f\u50cf\u679c\u51bb\u4e00\u6837',
+      'content_id': 7621,
+      'url': 'https://www.shanbay.com/bdc/mobile/preview/word?word=jelly',
+      'has_audio': true,
+      'en_definition': {'pos': 'v', 'defn': 'make into jelly'},
+      'object_id': 7621,
+      'content': 'jelly',
+      'pron': '\'d\u0292eli',
+      'pronunciation': '\'d\u0292eli',
+      'audio': 'http://media.shanbay.com/audio/us/jelly.mp3',
+      'us_audio': 'http://media.shanbay.com/audio/us/jelly.mp3'
+    }
   }
 
   // 先获取到弹窗应该出现的位置
   let html = ''
-  if (data.loading) {
+  if (res.loading) {
     // 查询之前的提示
-    html = `<div class="popover-title">${data.msg}</div>`
-  } else {
+    html = `<div class="popover-title">${res.msg}</div>`
+  } else if (res.status_code === 0) {
+    // let data = res.data;
+    let data = _data.data
     html = `
   <div class="arrow"></div>
   <div class="popover-inner">
@@ -87,9 +101,8 @@ const popover = (data) => {
             </div>
         <div class="popover-content">
             <div class="simple-definition" style="margin-bottom: 20px; font-size: 16px;">
-                ${data.definitions.cn.map(def => {
-                  return `<div><span>${def.pos}</span><span>${def.defn}</span></div>`
-                }).join('')}
+                ${data.cn_definition.defn.split('\n').map(def => `<div><span>${def.split('. ')[0]}. </span><span>${def.split('. ')[1]}</span></div>`).join('')}
+                ${Object.keys(data.en_definitions).map(pos => `<div><span>${pos}. </span><span>${data.en_definitions[pos].join(';')}</span></div>`).join('')}
             </div>
             <div class="add">
                 ${data.learning_id ? `<p><button class="forget pull-right btn btn-success">我忘了</button></p>` : `<p style="text-align: right;"><button id="add-word" class="btn btn-success">添加</button></p>`}
@@ -99,16 +112,14 @@ const popover = (data) => {
         </div>
     </div>
   `
-
-  html = `<div id="shanbay-popover" style="top: ${offset.top}; left: ${offset.left}; display: block" class="fade bottom in popover"> ${html}</div>`
-    // 查询结果的处理
-    /*
-     * 1，查询到的是新生词
-     * 2，查询到到是已有的单词
-     * 3，没有这个单词
-    * */
-    selectionParentBody.insertAdjacentHTML('beforeEnd', html)
+  } else if (res.status_code === 1) {
+    // 查询正常，但是没有这个单词
+    console.log(res)
+  } else {
+    console.error(res)
   }
+  html = `<div id="shanbay-popover" style="top: ${offset.top}; left: ${offset.left}; display: block" class="fade bottom in popover"> ${html}</div>`
+  selectionParentBody.insertAdjacentHTML('beforeEnd', html)
 }
 
 const getSelectionPosition = (range) => {
@@ -128,10 +139,10 @@ const setPopoverPosition = (offset) => {
 }
 
 const hidePopover = (delay) => {
-    setTimeout(function () {
-      selectionParentBody.removeChild(document.querySelector('#shanbay-popover'))
-      selectionParentBody = null
-    }, delay || 0)
+  setTimeout(function () {
+    selectionParentBody.removeChild(document.querySelector('#shanbay-popover'))
+    selectionParentBody = null
+  }, delay || 0)
 }
 
 if (document.readyState === 'complete') {
