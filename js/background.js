@@ -5,17 +5,22 @@
 
 // todo 添加双击选中
 
-var oauth = ShanbayOauth.initPage()
+window.oauth = ShanbayOauth.initPage()
 
-chrome.runtime.onMessage.addListener(function (req, sender, sendReponse) {
+chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
   switch (req.action) {
     case 'authorize':
-      oauth.authorize(sendReponse)
+      oauth.authorize(sendResponse)
       break
-    case 'wordLookup':
-      console.log('const request: ', request)
-      console.log('action wordLookup, data: ', req.data)
-      request(shanbayAPI.lookUp.url + req.data).then(res => sendReponse(res))
+    case 'lookup':
+      lookUp(req.word, oauth.access_token()).then(res => {
+        chrome.tabs.sendMessage(sender.tab.id, {'action': 'lookup', data: res})
+      })
+      break
+    case 'addWord':
+      addWord(req.id, oauth.access_token()).then(res => {
+        chrome.tabs.sendMessage(sender.tab.id, {'action': 'addWord', data: res})
+      })
   }
 })
 // todo 添加options页面

@@ -24,10 +24,10 @@ function renderUser() {
       notify('Authorized info', `Deauthorize successfully.`)
       window.close();
     }
-    headerImg.src = user.avatar.replace('128w_128h', '80w_80h');
+    headerImg.src = user.avatar.replace('128w_128h', '40w_40h');
     // 显示头像、菜单和退出，隐藏授权按钮
     header.classList = ''
-    document.querySelector('#authorization').classList = 'hide'
+    document.querySelector('#authorization').className = 'hide'
     batchAddBtn.classList = ''
     learnBtn.classList = ''
     settingBtn.classList = ''
@@ -42,8 +42,7 @@ function renderUser() {
   }
 
   if (bg.oauth.token_valid()) {
-    const account_api = shanbayAPI.userInfo.url + bg.oauth.access_token();
-    request(account_api).then(userInfo => {
+    userInfo().then(userInfo => {
       // todo 这个提醒放在这里还是不对
       notify('Authorized info', `Authorize successfully, name: ${userInfo.username}`, `http://www.shanbay.com/user/list/${userInfo.username}`)
       callback(userInfo)

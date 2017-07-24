@@ -29,18 +29,15 @@ const notify = (title = '人丑多读书', message = '少壮不努力，老大�
   })
 }
 
-const request = (url, options) => {
-  if (options) {
-    options.method = options.method || 'GET'
-  }
+const request = (url, options = {}) => {
   return fetch(url, options).then(res => {
     if (res.ok) {
       return res.json()
     } else {
-      debugLogger('error', `[${new Date().toLocaleDateString()}] request failed ${options.method} ${url} ${JSON.stringify(res)}`)
+      debugLogger('error', `[${new Date().toLocaleDateString()}] request failed ${options.method || 'GET'} ${url} ${JSON.stringify(res)}`)
       return Promise.reject(res)
     }
-  }).catch(e => debugLogger('error', `[${new Date().toLocaleDateString()}] fetch failed ${options.method} ${url} ${JSON.stringify(e)}`))
+  }).catch(e => debugLogger('error', `[${new Date().toLocaleDateString()}] fetch failed ${options.method || 'GET'} ${url} ${JSON.stringify(e)}`))
 }
 
 const shanbayAPI = {
@@ -50,7 +47,7 @@ const shanbayAPI = {
   },
   lookUp: {
     method: 'GET',
-    url: 'https://api.shanbay.com/bdc/search/?word=',
+    url: 'https://api.shanbay.com/bdc/search/?word={word}&access_token=',
     params: ['word']
   },
   add: {
@@ -88,56 +85,34 @@ const localStorageSpecification = [
   {'paraphrase': 'bilingual', desc: '默认释义', enum: ['Chinese', 'English', 'bilingual']}
 ]
 
-const localStorageSettings = localStorageSpecification.map(setting => {delete setting.enum;delete setting.desc; return setting})
+const localStorageSettings = localStorageSpecification.map(setting => {
+  delete setting.enum
+  delete setting.desc
+  return setting
+})
 
 /**
  * 构造所有需要跟shanbay交互的方法
  * 所有的方法的返回值都是promise
  * */
-const userInfo = () => {
-  return fetch(shanbayAPI.userInfo.url).then(res => {
-    if (res.ok) {
-      return res.json()
-    } else {
-      return Promise.reject(res)
-    }
-  }).catch(e => debugLogger('error', e))
+const userInfo = (token) => {
+  return request(shanbayAPI.userInfo.url + token)
 }
 
-const lookUp = (word) => {
-  return fetch(shanbayAPI.lookUp.url + word).then(res => {
-    if (res.ok) {
-      return res.json()
-    } else {
-      return Promise.reject(res)
-    }
-  }).catch(e => (debugLogger('error', e)))
+const lookUp = (word, token) => {
+  return request((shanbayAPI.lookUp.url + token).replace('{word}', word))
 }
-const add = (id) => {
-  return fetch(shanbayAPI.add.url, {
+const addWord = (id, token) => {
+  return request(shanbayAPI.add.url + token, {
     method: shanbayAPI.add.method,
-    body: {
-      id
-    }
-  }).then(res => {
-    if (res.ok) {
-      return res.json()
-    } else {
-      return Promise.reject(res)
-    }
-  }).catch(e => (debugLogger('error', e)))
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({id})
+  })
 }
-const forget = (id) => {
-  return fetch(shanbayAPI.forget.url, {
-    method: shanbayAPI.forget.method,
-    body: {
-      id
-    }
-  }).then(res => {
-    if (res.ok) {
-      return res.json()
-    } else {
-      return Promise.reject(res)
-    }
-  }).catch(e => (debugLogger('error', e)))
+const forget = (learningId, token) => {
+  return request((shanbayAPI.forget.url + token).replace('{learning_id}', learningId), {
+    method: shanbayAPI.forget.method
+  })
 }
