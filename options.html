@@ -15,23 +15,6 @@
     <hr>
     <ul>
         <li>
-            <h3>弹出框显示内容</h3>
-            <p>
-                <label>
-                    <input type="checkbox" name="content-etyma" value="content-etyma">词根
-                </label>
-                <label>
-                    <input type="checkbox" name="content-derivate" value="content-derivate">词汇派生
-                </label>
-                <label>
-                    <input type="checkbox" name="content-sentence" value="content-sentence">例句
-                </label>
-                <label>
-                    <input type="checkbox" name="content-note" value="content-note">笔记
-                </label>
-            </p>
-        </li>
-        <li>
             <h3>查词的两种方式：</h3>
             <h3>1，双击查词</h3>
             <p>
@@ -49,6 +32,15 @@
             </p>
         </li>
         <li>
+            <h3>显示例句</h3>
+            <p>
+                <label>
+                    <input type="radio" name="content-sentence" value="true" checked>是
+                    <input type="radio" name="content-sentence" value="false">否
+                </label>
+            </p>
+        </li>
+        <li>
             <h3>默认加入生词库</h3>
             <p>
                 <label>
@@ -56,26 +48,16 @@
                     <input type="radio" name="addBook" value="false" checked>否
                 </label>
             </p>
-
         </li>
         <li>
-            <h3>显示单词变形</h3>
+            <h3>开启背单词定时提醒(每3小时)</h3>
             <p>
                 <label>
-                    <input type="radio" name="deformation" value="true">是
-                    <input type="radio" name="deformation" value="false" checked>否
+                    <input type="radio" name="alarm" value="true" checked>是
+                    <input type="radio" name="alarm" value="false">否
                 </label>
             </p>
-
-        </li>
-        <li>
-            <h3>显示常用短语</h3>
-            <p>
-                <label>
-                    <input type="radio" name="commonPhrase" value="true">是
-                    <input type="radio" name="commonPhrase" value="false" checked>否
-                </label>
-            </p>
+            <p><strong>提醒内容定制: </strong><input type="text" name="reminderContent" value="少壮不努力，老大背单词"></p>
         </li>
         <li>
             <h3>默认发音</h3>
@@ -97,31 +79,12 @@
                 </select>
             </p>
         </li>
-        <li>
-            <h3>开启背单词定时提醒(每3小时)</h3>
-            <p>
-                <label>
-                    <input type="radio" name="alarm" value="true" checked>是
-                    <input type="radio" name="alarm" value="false">否
-                </label>
-            </p>
-            <p><strong>提醒内容定制: </strong><input type="text" name="reminderContent" value="少壮不努力，老大背单词"></p>
-
-        </li>
-        <li>
-            <h3>显示音节划分</h3>
-            <p>
-                <label>
-                    <input type="radio" name="syllabification" value="true" checked>是
-                    <input type="radio" name="syllabification" value="false">否
-                </label>
-            </p>
-        </li>
     </ul>
 
-    <p id="saveP">
+    <div id="saveP">
         <button id="save">保存</button>
-    </p>
+        <p id="saveRes" class="hide">保存成功</p>
+    </div>
 
     <hr>
 

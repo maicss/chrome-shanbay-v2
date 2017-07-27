@@ -29,7 +29,8 @@
         "js/const.js",
         "js/main.js"
       ],
-      "matches": ["<all_urls>"]
+      "matches": ["<all_urls>"],
+      "exclude_matches": ["*://*.shanbay.com/*"]
     }
   ],
   "permissions": [
@@ -42,7 +43,7 @@
     "*://*/*"
   ],
   "web_accessible_resources": [
-    "images/m.png"
+    "images/*"
   ],
   "content_security_policy": "script-src 'self' 'unsafe-eval' ; object-src 'self'"
 }

@@ -12,6 +12,9 @@ header h1 {
 h3 {
     margin: 0;
 }
+.hide {
+    display: none;
+}
 
 p {
     /* margin: 0; */
@@ -51,6 +54,12 @@ input[type='text'] {
     border: 1px solid #666;
     outline: none;
     cursor: pointer;
+}
+
+#saveRes {
+    text-align: center;
+    font-size: 20px;
+    color: #1c544c;
 }
 
 .select {

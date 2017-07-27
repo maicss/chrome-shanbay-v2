@@ -4,6 +4,11 @@ const debugLogger = (level = 'log', ...msg) => {
   if (devMode) console[level](...msg)
 }
 
+// debugLogger 的兼容性写法, 箭头函数里面不能使用arguments
+// const debugLogger = function(level) {
+//   console[level].apply(window, [].slice.call(arguments, 1))
+// }
+
 const notify = (title = '人丑多读书', message = '少壮不努力，老大背单词', url = 'https://www.shanbay.com/') => {
   let hasNotified = false
   const options = {
@@ -68,27 +73,26 @@ const shanbayAPI = {
  * desc 是这个键值对的描述
  * enum 是这个键的取值范围
  * */
-const localStorageSpecification = [
-  {'content-etyma': false, desc: '是否显示词根', enum: [true, false]},
-  {'content-derivate': false, desc: '是否显示派生词', enum: [true, false]},
+const extensionSpecification = [
   {'content-sentence': false, desc: '是否显示例句', enum: [true, false]},
-  {'content-note': false, desc: '是否显示笔记', enum: [true, false]},
   {'clickLookup': true, desc: '双击选中查词', enum: [true, false]},
   {'contextLookup': true, desc: '右键查词', enum: [true, false]},
   {'addBook': false, desc: '默认添加到单词本', enum: [true, false]},
-  {'deformation': false, desc: '默认显示单词变形', enum: [true, false]},
-  {'commonPhrase': false, desc: '默认显示常用短语', enum: [true, false]},
   {'alarm': true, desc: '定时提醒', enum: [true, false]},
   {'reminderContent': '少壮不努力，老大背单词', desc: '提示框内容',},
-  {'syllabification': true, desc: '默认显示音节划分', enum: [true, false]},
   {'autoRead': 'false', desc: '自动发音', enum: ['EN', 'US', 'false']},
   {'paraphrase': 'bilingual', desc: '默认释义', enum: ['Chinese', 'English', 'bilingual']}
 ]
 
-const localStorageSettings = localStorageSpecification.map(setting => {
+const storageSettingArray = extensionSpecification.map(setting => {
   delete setting.enum
   delete setting.desc
   return setting
+})
+
+let storageSettingMap = {};
+storageSettingArray.forEach(item => {
+  Object.assign(storageSettingMap, item)
 })
 
 /**

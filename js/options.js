@@ -55,12 +55,31 @@ const getOptions = () => {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  renderOptions(localStorageSettings)
-  document.querySelector('#save').click = function () {
-    let settings = getOptions()
-    settings.forEach(setting => {
-      let key = Object.keys(setting)[0]
-      localStorage[key] = setting[key]
+  chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
+    console.log('chromeShanbaySettings: ', settings)
+    if (Object.keys(settings).length) {
+      renderOptions(settings.chromeShanbaySettings)
+    } else {
+      renderOptions(storageSettingArray)
+    }
+  })
+
+
+  document.querySelector('#save').onclick = function () {
+    let _settings = getOptions()
+    chrome.storage.sync.set({chromeShanbaySettings: _settings}, () => {
+      console.log('lastError in options js: ', chrome.runtime.lastError)
+      if (!chrome.runtime.lastError) {
+        // _settings.forEach(item => {
+        //   Object.assign(storage, item)
+        // })
+        const saveRes = document.querySelector('#saveRes');
+        saveRes.className = ''
+        setTimeout(function () {
+          saveRes.className = 'hide'
+        }, 1000)
+      }
+      console.log('chromeShanbaySettings settled.')
     })
   }
 })
