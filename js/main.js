@@ -53,6 +53,9 @@ const pendingSearchSelection = (e) => {
   if (_popover) {
     return
   }
+  let _selection = getSelection()
+  console.log(_selection.rangeCount)
+  if (!_selection.rangeCount) return
   let _range = getSelection().getRangeAt(0)
   offset = getSelectionPosition(_range)
   if (e && storage.clickLookup) {

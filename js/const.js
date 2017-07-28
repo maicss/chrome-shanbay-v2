@@ -42,6 +42,7 @@ const notify = (opt = {}) => {
 const request = (url, options = {}) => {
   return fetch(url, options).then(res => {
     if (res.ok) {
+      if (options.type === 'buffer') return res.arrayBuffer()
       return res.json()
     } else {
       debugLogger('error', `[${new Date().toLocaleDateString()}] request failed ${options.method || 'GET'} ${url} ${JSON.stringify(res)}`)

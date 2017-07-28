@@ -3,9 +3,22 @@
  *
  * */
 
-// todo 添加双击选中
 let storage = {}
 window.oauth = ShanbayOauth.initPage()
+/*=====================使用web音频接口播放音频的方法==================*/
+const context = new AudioContext()
+const playSound = url => {
+  request(url, {type: 'buffer'}).then(r => {
+    context.decodeAudioData(r, function (buffer) {
+      const source = context.createBufferSource()
+      source.buffer = buffer
+      source.connect(context.destination)
+      source.start(0)
+    })
+
+  })
+}
+/*=================================================================*/
 
 chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
   switch (req.action) {
@@ -23,7 +36,6 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
       })
       break
     case 'playSound':
-      console.log(req.url)
       playSound(req.url)
       break
     case 'todayTask':
@@ -46,7 +58,6 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
   }
 })
 
-const playSound = url => {}
 
 chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
   console.log('Extension loaded......')
