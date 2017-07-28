@@ -1,30 +1,30 @@
 const bg = chrome.extension.getBackgroundPage()
 
-function renderUser() {
+function renderUser () {
 
-  function callback(user) {
+  function callback (user) {
     const header = document.querySelector('#header')
     const batchAddBtn = document.querySelector('#batch-add')
     const learnBtn = document.querySelector('#begin-learning')
     const settingBtn = document.querySelector('#options')
     const logout = document.querySelector('#logout')
 
-    const headerImg = header.querySelector('img');
-    const userLink = header.querySelector('a');
-    userLink.href = 'http://www.shanbay.com/user/list/' + user.username;
+    const headerImg = header.querySelector('img')
+    const userLink = header.querySelector('a')
+    userLink.href = 'http://www.shanbay.com/user/list/' + user.username
     userLink.onclick = function () {
       chrome.tabs.create({
         url: this.href
       })
-    };
+    }
 
     logout.onclick = function () {
-      bg.oauth.clearToken();
-      delete bg.User;
-      notify('Authorized info', `Deauthorize successfully.`)
-      window.close();
+      bg.oauth.clearToken()
+      delete bg.User
+      notify({title: 'Authorized info', message: `Deauthorize successfully.`})
+      window.close()
     }
-    headerImg.src = user.avatar.replace('128w_128h', '40w_40h');
+    headerImg.src = user.avatar.replace('128w_128h', '40w_40h')
     // 显示头像、菜单和退出，隐藏授权按钮
     header.classList = ''
     document.querySelector('#authorization').className = 'hide'
@@ -32,34 +32,37 @@ function renderUser() {
     learnBtn.classList = ''
     settingBtn.classList = ''
     logout.classList = ''
-    bg.User = user;
+    bg.User = user
   }
 
-
   if (bg.User) {
-    callback(bg.User);
-    return;
+    callback(bg.User)
+    return
   }
 
   if (bg.oauth.token_valid()) {
     userInfo(bg.oauth.access_token()).then(userInfo => {
       // todo 这个提醒放在这里还是不对
-      notify('Authorized info', `Authorize successfully, name: ${userInfo.username}`, `http://www.shanbay.com/user/list/${userInfo.username}`)
+      notify({
+        title: 'Authorized info',
+        message: `Authorize successfully, name: ${userInfo.username}`,
+        url: `http://www.shanbay.com/user/list/${userInfo.username}`
+      })
       callback(userInfo)
     })
   } else {
     chrome.runtime.sendMessage({
       action: 'authorize'
     }, function () {
-      renderUser();
+      renderUser()
     })
   }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  renderUser();
+  renderUser()
   document.querySelector('#authorization').onclick = function () {
-    renderUser();
+    renderUser()
   }
   document.querySelector('#batch-add').onclick = function () {
     chrome.tabs.create({url: 'http://www.shanbay.com/bdc/vocabulary/add/batch/'})
@@ -70,4 +73,4 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('#options').onclick = function () {
     chrome.tabs.create({url: 'options.html'})
   }
-});
+})

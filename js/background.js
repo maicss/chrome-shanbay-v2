@@ -21,8 +21,32 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
       addWord(req.id, oauth.access_token()).then(res => {
         chrome.tabs.sendMessage(sender.tab.id, {'action': 'addWord', data: res})
       })
+      break
+    case 'playSound':
+      console.log(req.url)
+      playSound(req.url)
+      break
+    case 'todayTask':
+      chrome.cookies.get({url: 'https://www.shanbay.com/bdc/review/', name: 'auth_token'}, function (cookies) {
+        request('https://www.shanbay.com/api/v1/bdc/stats/today/', {credentials: 'include'}).then(r => {
+
+          if (r.count === 0) {
+            chrome.browserAction.setBadgeText({text: ''})
+          } else {
+            chrome.browserAction.setBadgeText({text: r.data.num_left + ''})
+            notify({
+              message: `今天还有${r.data.num_left}个单词需要复习`,
+              url: 'https://www.shanbay.com/bdc/review/'
+            })
+          }
+
+        })
+      })
+      break
   }
 })
+
+const playSound = url => {}
 
 chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
   console.log('Extension loaded......')

@@ -9,12 +9,17 @@ const debugLogger = (level = 'log', ...msg) => {
 //   console[level].apply(window, [].slice.call(arguments, 1))
 // }
 
-const notify = (title = '人丑多读书', message = '少壮不努力，老大背单词', url = 'https://www.shanbay.com/') => {
+const notify = (opt = {}) => {
+  opt = {
+    title: opt.title || '人丑多读书',
+    message: opt.message || '少壮不努力，老大背单词',
+    url: opt.url || 'https://www.shanbay.com/'
+  }
   let hasNotified = false
   const options = {
     type: 'basic',
-    title,
-    message,
+    title: opt.title,
+    message: opt.message,
     iconUrl: '../images/icon_48.png'
   }
   let noteID = Math.random().toString(36)
@@ -27,7 +32,7 @@ const notify = (title = '人丑多读书', message = '少壮不努力，老大�
     chrome.notifications.clear(notifyID)
     if (noteID === notifyID) {
       chrome.tabs.create({
-        url
+        url: opt.url
       })
     }
     hasNotified = false
@@ -74,7 +79,7 @@ const shanbayAPI = {
  * enum 是这个键的取值范围
  * */
 const extensionSpecification = [
-  {'content-sentence': false, desc: '是否显示例句', enum: [true, false]},
+  // {'content-sentence': false, desc: '是否显示例句', enum: [true, false]},
   {'clickLookup': true, desc: '双击选中查词', enum: [true, false]},
   {'contextLookup': true, desc: '右键查词', enum: [true, false]},
   {'addBook': false, desc: '默认添加到单词本', enum: [true, false]},

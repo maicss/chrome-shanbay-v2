@@ -2,6 +2,28 @@ let selectionParentBody = null
 let offset = null
 let storage = {}
 
+//
+const getTodayTask = () => {
+  /**
+   * 每小时检测一下今天的剩余单词数量
+   * 必须登录扇贝之后才可以使用
+   * @return number word-last-number
+   * */
+  let taskTimer
+  taskTimer = setInterval(function () {
+    if (!storage.alarm && taskTimer) {
+      clearInterval(taskTimer)
+    } else {
+      chrome.runtime.sendMessage({
+        action: 'todayTask'
+      })
+    }
+  }, 1000 * 60 * 60 * 3)
+
+}
+
+getTodayTask()
+
 chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
   console.log('chrome storage loaded......')
   if (Object.keys(settings).length) {
@@ -79,19 +101,17 @@ const popover = (res) => {
     <a href="https://www.shanbay.com/bdc/vocabulary/${data.id}" style="float: right;" target="_blank"> 详细</a>
     <div>
         ${data.pronunciations.us ? `<span>us: </span><small>/${data.pronunciations.us}/</small>
-        <audio src="${data.us_audio}" id="shanbay-us-audio"></audio>
-        <span class="speaker" data-target="shanbay-us-audio"></span>` : ''}
+        <span class="speaker" data-target="${data.us_audio}"></span>` : ''}
         
         ${data.pronunciations.uk ? `<span>uk: </span><small>/${data.pronunciations.uk}/</small>
-        <audio src="${data.uk_audio}" id="shanbay-uk-audio"></audio>
-        <span class="speaker" data-target="shanbay-uk-audio"></span>` : ''}
+        <span class="speaker" data-target="${data.uk_audio}"></span>` : ''}
         
     </div>
 </div>
 <div class="popover-content">
     <div class="simple-definition" style="margin-bottom: 20px; font-size: 16px;">
-        ${data.cn_definition.pos ? `<div><strong>${data.cn_definition.pos} </strong><span>${data.cn_definition.defn}</span></div>` : data.cn_definition.defn ? data.cn_definition.defn.split('\n').join('<br>') : ''}
-        ${Object.keys(data.en_definitions).map(pos => `<div><span>${pos}. </span><span>${data.en_definitions[pos].join(';')}</span></div>`).join('')}
+        ${storage.paraphrase !== 'English' ? (data.cn_definition.pos ? `<div><strong>${data.cn_definition.pos} </strong><span>${data.cn_definition.defn}</span></div>` : data.cn_definition.defn ? data.cn_definition.defn.split('\n').join('<br>') : '' ) : ''}
+        ${ storage.paraphrase !== 'Chinese' ? Object.keys(data.en_definitions).map(pos => `<div><span>${pos}. </span><span>${data.en_definitions[pos].join(';')}</span></div>`).join('') : ''}
     </div>
     <div class="add" style="text-align: right;">
         ${data.learning_id ? `<p id="shanbay-forget-word"><button class="forget pull-right btn btn-success">我忘了</button></p>` : `<p><button id="shanbay-add-word" class="btn btn-success">添加</button></p>`}
@@ -106,7 +126,7 @@ const popover = (res) => {
 
     [].forEach.call(document.querySelectorAll('#shanbay-popover .speaker'), (speaker) => {
       speaker.addEventListener('click', function () {
-        document.querySelector(`#${this.dataset.target}`).play()
+        chrome.runtime.sendMessage({action: 'playSound', url: this.dataset.target})
       })
       console.log(speaker.dataset)
     })
@@ -116,24 +136,29 @@ const popover = (res) => {
         chrome.runtime.sendMessage({action: 'forgetWord', learningId: data.learning_id})
       })
     } else {
-      document.querySelector('#shanbay-add-word').addEventListener('click', function () {
+      if (storage.addBook) {
         document.querySelector('#shanbay-add-word').className = 'hide'
         document.querySelector('#shanbay-under-adding').className = ''
         chrome.runtime.sendMessage({action: 'addWord', id: data.id})
-      })
+      } else {
+        document.querySelector('#shanbay-add-word').addEventListener('click', function () {
+          document.querySelector('#shanbay-add-word').className = 'hide'
+          document.querySelector('#shanbay-under-adding').className = ''
+          chrome.runtime.sendMessage({action: 'addWord', id: data.id})
+        })
+      }
     }
 
   } else if (res.status_code === 1) {
     // 查询正常，但是没有这个单词
-    console.log(res)
     document.querySelector('#shanbay-popover .popover-inner').innerHTML = '<div class="popover-title" style="border: none;">没有找到这个单词</div>'
   } else {
     console.error('popup unexcept res', res)
   }
 }
 
+// background 交互返回信息的处理
 chrome.runtime.onMessage.addListener(function (res, sender) {
-  console.log('get res: ', JSON.stringify(res.data))
   let addResult
   switch (res.action) {
     case 'lookup':
@@ -194,7 +219,7 @@ const hidePopover = (delay) => {
   }, delay || 0)
 }
 
-if (document.addEventListener || event.type === "load" || document.readyState === "complete") {
+if (document.addEventListener || event.type === 'load' || document.readyState === 'complete') {
 // document.addEventListener('DOMContentLoaded', function () {
   console.log('Extension detected DOMContentLoaded......')
   document.addEventListener('dblclick', pendingSearchSelection)
