@@ -25,7 +25,7 @@ const getTodayTask = () => {
 getTodayTask()
 
 chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
-  console.log('chrome storage loaded......')
+  debugLogger('info', 'chrome storage loaded')
   if (Object.keys(settings).length) {
     settings.chromeShanbaySettings.forEach(item => {
       Object.assign(storage, item)
@@ -36,6 +36,7 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
 })
 
 chrome.storage.onChanged.addListener(function (changes, areaName) {
+  debugLogger('info', 'chrome storage changed')
   storage = {}
   changes.chromeShanbaySettings.newValue.forEach(item => {
     Object.assign(storage, item)
@@ -54,7 +55,6 @@ const pendingSearchSelection = (e) => {
     return
   }
   let _selection = getSelection()
-  console.log(_selection.rangeCount)
   if (!_selection.rangeCount) return
   let _range = getSelection().getRangeAt(0)
   offset = getSelectionPosition(_range)
@@ -66,6 +66,7 @@ const pendingSearchSelection = (e) => {
         loading: true,
         msg: '查询中....（请确保已登录扇贝网）'
       })
+      debugLogger('info', 'get word: ', matchResult[0])
       chrome.runtime.sendMessage({
         action: 'lookup',
         word: matchResult[0]
@@ -80,6 +81,8 @@ const pendingSearchSelection = (e) => {
 const popover = (res) => {
   /**
    * 弹出层逻辑处理器
+   * 先在页面中插入需要的弹出框，然后根据不同状态插入不同的内容
+   * 里面还有弹出框上的各种交互事件的处理函数
    * @param data 需要弹出的数据和状态
    * */
   if (!selectionParentBody) {
@@ -95,10 +98,10 @@ const popover = (res) => {
 
   if (res.loading) {
     // 查询之前的提示
-    document.querySelector('#shanbay-popover .popover-title').innerHTML = html
+    document.querySelector('#shanbay-popover .popover-title').innerHTML = res.msg
   } else if (res.status_code === 0) {
     let data = res.data
-    html = `
+    let contentHtml = `
 <div class="popover-title">
     <span class="word">${data.content}</span>
     <a href="https://www.shanbay.com/bdc/vocabulary/${data.id}" style="float: right;" target="_blank"> 详细</a>
@@ -124,16 +127,17 @@ const popover = (res) => {
 </div>
   `
 
-    document.querySelector('#shanbay-popover .popover-inner').innerHTML = html;
-    // 各种点击事件的处理
+    document.querySelector('#shanbay-popover .popover-inner').innerHTML = contentHtml;
 
+    // 各种点击事件的处理
+    // 发音事件的处理
     [].forEach.call(document.querySelectorAll('#shanbay-popover .speaker'), (speaker) => {
       speaker.addEventListener('click', function () {
         chrome.runtime.sendMessage({action: 'playSound', url: this.dataset.target})
       })
-      console.log(speaker.dataset)
     })
 
+    // 添加单词和我忘了的事件处理
     if (data.learning_id) {
       document.querySelector('#shanbay-forget-word').addEventListener('click', function () {
         chrome.runtime.sendMessage({action: 'forgetWord', learningId: data.learning_id})
@@ -156,7 +160,9 @@ const popover = (res) => {
     // 查询正常，但是没有这个单词
     document.querySelector('#shanbay-popover .popover-inner').innerHTML = '<div class="popover-title" style="border: none;">没有找到这个单词</div>'
   } else {
-    console.error('popup unexcept res', res)
+    let m = 'unHandle response!!! Please tell <a href="https://github.com/maicss/chrome-shanbay-v2/issues">me</a> which word you lookup, thanks.'
+    document.querySelector('#shanbay-popover .popover-title').innerHTML = m
+    console.error(m, JSON.stringify(res))
   }
 }
 
@@ -172,7 +178,7 @@ chrome.runtime.onMessage.addListener(function (res, sender) {
       addResult = document.querySelector('#shanbay-add-result')
       addResult.className = ''
       if (res.data.msg === 'SUCCESS') {
-        addResult.innerHTML = `成功加入生词库！<a href="https://www.shanbay.com/review/learning/${res.data.data.id}">查看</a>`
+        addResult.innerHTML = `成功加入生词库！`
       } else {
         addResult.innerHTML = '单词添加失败，请重试'
       }
@@ -182,7 +188,7 @@ chrome.runtime.onMessage.addListener(function (res, sender) {
       addResult = document.querySelector('#shanbay-add-result')
       addResult.className = ''
       if (res.data.msg === 'SUCCESS') {
-        addResult.innerHTML = `成功加入生词库！<a href="https://www.shanbay.com/review/learning/${res.data.data.id}">查看</a>`
+        addResult.innerHTML = `成功加入生词库！`
       } else {
         addResult.innerHTML = '单词添加失败，请重试'
       }
@@ -194,7 +200,7 @@ const getSelectionPosition = (range) => {
   /**
    * 得到弹出框的绝对位置 和 弹出框箭头的位置
    * @param range Range的实例
-   * @return left, top 弹出框的位置 distance， 箭头的偏移量*/
+   * @return left, top 弹出框的位置; distance, 箭头的偏移量*/
   let {left, top, height, width} = range.getBoundingClientRect()
   // left += width / 2
   // 这里的22px是为了和单词保持一定距离
@@ -209,13 +215,19 @@ const getSelectionPosition = (range) => {
     distance = 140 + left
     left = 0
   } else if (left + 280 > window.innerWidth) {
-    distance = 140 + (left + 280 - windowWidth)
-    left = windowWidth - 280
+    // 这里的10是为里防止右边边界出现的三角箭头出现在弹出框外面的情况，纯粹为了美观
+    // 最终的效果就是单词在右边边界的时候，会跟浏览器的边框有一定的距离，因为排版的原因，右边可能空出一大截，而且不会对齐，但是浏览器左边肯定都是对齐的，所以弹出框在左边的时候，一定是靠在浏览器边界的。
+    distance = 140 + (left + 280 - windowWidth) - 10
+    left = windowWidth + 10 - 280
   }
   return {left, top, distance}
 }
 
 const hidePopover = (delay) => {
+  /**
+   * 隐藏弹出框的方法
+   * @param delay, ms 隐藏弹出框的延迟
+   * */
   setTimeout(function () {
     selectionParentBody.removeChild(document.querySelector('#shanbay-popover'))
     selectionParentBody = null
@@ -224,7 +236,7 @@ const hidePopover = (delay) => {
 
 if (document.addEventListener || event.type === 'load' || document.readyState === 'complete') {
 // document.addEventListener('DOMContentLoaded', function () {
-  console.log('Extension detected DOMContentLoaded......')
+  console.log('Shanbay Extension DOMContentLoaded......')
   document.addEventListener('dblclick', pendingSearchSelection)
   document.addEventListener('click', function (e) {
     // 屏蔽弹出框的双击事件

@@ -9,8 +9,7 @@
   "background": {
     "scripts": [
       "js/const.js",
-      "lib/config.js",
-      "lib/shanbay_oauth2.js",
+      "js/shanbay_oauth2.js",
       "js/background.js"
     ],
     "persistent": true
@@ -30,20 +29,15 @@
         "js/main.js"
       ],
       "matches": ["<all_urls>"],
-      "exclude_matches": ["*://*.shanbay.com/*"]
+      "exclude_matches": ["*://*.shanbay.com/*", "*://*.hjenglish.com/*"]
     }
   ],
   "permissions": [
     "cookies",
     "contextMenus",
-    "activeTab",
     "tabs",
     "storage",
     "notifications",
     "*://*/*"
-  ],
-  "web_accessible_resources": [
-    "images/*"
-  ],
-  "content_security_policy": "script-src 'self' 'unsafe-eval' ; object-src 'self'"
+  ]
 }

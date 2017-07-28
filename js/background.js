@@ -5,6 +5,7 @@
 
 let storage = {}
 window.oauth = ShanbayOauth.initPage()
+const token = oauth.access_token()
 /*=====================使用web音频接口播放音频的方法==================*/
 const context = new AudioContext()
 const playSound = url => {
@@ -26,13 +27,18 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
       oauth.authorize(sendResponse)
       break
     case 'lookup':
-      lookUp(req.word, oauth.access_token()).then(res => {
+      lookUp(req.word, token).then(res => {
         chrome.tabs.sendMessage(sender.tab.id, {'action': 'lookup', data: res})
       })
       break
     case 'addWord':
-      addWord(req.id, oauth.access_token()).then(res => {
+      addWord(req.id, token).then(res => {
         chrome.tabs.sendMessage(sender.tab.id, {'action': 'addWord', data: res})
+      })
+      break
+    case 'forgetWord':
+      forget(req.learningId, token).then(res => {
+        chrome.tabs.sendMessage(sender.tab.id, {'action': 'forgetWord', data: res})
       })
       break
     case 'playSound':
@@ -60,8 +66,6 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
 
 
 chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
-  console.log('Extension loaded......')
-  console.log(document.readyState)
   if (Object.keys(settings).length) {
     settings.chromeShanbaySettings.forEach(item => {
       Object.assign(storage, item)
@@ -79,15 +83,10 @@ chrome.contextMenus.removeAll(function () {
       title: '在扇贝网中查找%s',
       contexts: ['selection'],
       onclick: function (info, tab) {
-        lookUp(info.selectionText, oauth.access_token()).then(res => {
+        lookUp(info.selectionText, token).then(res => {
           chrome.tabs.sendMessage(tab.id, {'action': 'lookup', data: res})
         })
       }
     })
   }
 })
-// todo 添加options页面
-
-// todo 添加Oauth认证
-
-// todo 添加TTS

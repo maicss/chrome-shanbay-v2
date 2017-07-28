@@ -1,6 +1,10 @@
 const devMode = !('update_url' in chrome.runtime.getManifest())
 
 const debugLogger = (level = 'log', ...msg) => {
+  /**
+   * 开发模式的log打印
+   * @param level log的等级
+   * @param msg log信息*/
   if (devMode) console[level](...msg)
 }
 
@@ -10,6 +14,10 @@ const debugLogger = (level = 'log', ...msg) => {
 // }
 
 const notify = (opt = {}) => {
+  /**
+   * chrome 通知处理方法
+   * 传入的参数就是chrome notifications的参数
+   * */
   opt = {
     title: opt.title || '人丑多读书',
     message: opt.message || '少壮不努力，老大背单词',
@@ -40,6 +48,12 @@ const notify = (opt = {}) => {
 }
 
 const request = (url, options = {}) => {
+  /**
+   * 基于fetch的网络请求方法的封装
+   * 只有两种数据的返回，buffer和json，因为这个应用里面只用到了这两种
+   * @param 和fetch一样
+   * @return Promise
+  * */
   return fetch(url, options).then(res => {
     if (res.ok) {
       if (options.type === 'buffer') return res.arrayBuffer()
@@ -51,6 +65,7 @@ const request = (url, options = {}) => {
   }).catch(e => debugLogger('error', `[${new Date().toLocaleDateString()}] fetch failed ${options.method || 'GET'} ${url} ${JSON.stringify(e)}`))
 }
 
+// shanbay API v2的需要用到的方法，没什么用，只是一个参考
 const shanbayAPI = {
   userInfo: {
     method: 'GET',
@@ -89,13 +104,14 @@ const extensionSpecification = [
   {'autoRead': 'false', desc: '自动发音', enum: ['EN', 'US', 'false']},
   {'paraphrase': 'bilingual', desc: '默认释义', enum: ['Chinese', 'English', 'bilingual']}
 ]
-
+// 这个是上面的实际用来存储的数据
 const storageSettingArray = extensionSpecification.map(setting => {
   delete setting.enum
   delete setting.desc
   return setting
 })
 
+// 这个是上面数据的Map化，只是为了用起来更方便一点
 let storageSettingMap = {};
 storageSettingArray.forEach(item => {
   Object.assign(storageSettingMap, item)
@@ -123,6 +139,8 @@ const addWord = (id, token) => {
 }
 const forget = (learningId, token) => {
   return request((shanbayAPI.forget.url + token).replace('{learning_id}', learningId), {
-    method: shanbayAPI.forget.method
+    method: shanbayAPI.forget.method,
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({forget: 1})
   })
 }

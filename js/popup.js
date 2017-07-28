@@ -42,12 +42,6 @@ function renderUser () {
 
   if (bg.oauth.token_valid()) {
     userInfo(bg.oauth.access_token()).then(userInfo => {
-      // todo 这个提醒放在这里还是不对
-      notify({
-        title: 'Authorized info',
-        message: `Authorize successfully, name: ${userInfo.username}`,
-        url: `http://www.shanbay.com/user/list/${userInfo.username}`
-      })
       callback(userInfo)
     })
   } else {

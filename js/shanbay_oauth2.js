@@ -1,3 +1,13 @@
+const AppConf = {
+  "client_id":"e7a33e28d619a5d1f7a3",
+};
+
+const ShanbayConf = {
+  "auth_url": "https://api.shanbay.com/oauth2/authorize/?response_type=token&client_id=",
+  "auth_success_url": "/oauth2/auth/success/"
+};
+
+
 function ShanbayOauth (client_id, conf) {
   this.client_id = client_id
   this.conf = conf
@@ -7,7 +17,7 @@ function ShanbayOauth (client_id, conf) {
   * include lib/config.js and then call initPage in your background page
 */
 ShanbayOauth.initPage = function () {
-  console.log('init Page')
+  debugLogger('log', 'init Page')
   window.OAuth = ShanbayOauth.fromConfig(AppConf, ShanbayConf)
   return window.OAuth
 }
@@ -20,8 +30,8 @@ ShanbayOauth.fromConfig = function (app_conf, shanbay_conf) {
 }
 
 ShanbayOauth.prototype.authorize = function (callback) {
-  console.log('in authorize')
-  let authorize_url = this.conf.api_root + this.conf.auth_url + '?response_type=token&client_id=' + this.client_id
+  debugLogger('log', 'in authorize')
+  let authorize_url = this.conf.auth_url + '' + this.client_id
   chrome.tabs.create({url: authorize_url}, function (tab) {
     window.OAuth.tabId = tab.id
   })
@@ -31,7 +41,12 @@ ShanbayOauth.prototype.authorize = function (callback) {
 }
 
 ShanbayOauth.prototype.onAuthorize = function (tabId, changeInfo, tab) {
-  console.log('onAuthorize')
+  console.log(tabId, changeInfo, tab)
+  notify({
+    title: 'Authorized info',
+    message: `Authorize successfully`,
+    url: ``
+  })
   if (window.OAuth.tabId !== tabId)
     return false
 
@@ -42,6 +57,7 @@ ShanbayOauth.prototype.onAuthorize = function (tabId, changeInfo, tab) {
     hash = JSON.parse('{"' + decodeURI(hash).replace(/&/g, '","').replace(/=/g, '":"') + '"}')
     localStorage.access_token = hash.access_token
     localStorage.expired_at = new Date((new Date()).getTime() + hash.expires_in * 1000)
+    // todo 检测这个tab是不是存在，然后在关闭
     chrome.tabs.remove(tabId)
     if (window.OAuth.callback) {
       window.OAuth.callback()

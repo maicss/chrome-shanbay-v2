@@ -1,6 +1,8 @@
-// todo save localStorage to background
-// todo 测试用户未登录的状况
 const renderOptions = (settings) => {
+  /**
+   * 根据配置渲染页面的方法
+   * @param settings: 页面配置的数组
+  * */
   settings.forEach(setting => {
     let name = Object.keys(setting)[0]
     let value = setting[name]
@@ -25,38 +27,42 @@ const renderOptions = (settings) => {
 }
 
 const getOptions = () => {
+  /**
+   * 根据页面的选项获取设置信息
+   * @return setting 配置信息的数组
+   * */
   const inputs = document.querySelectorAll('input')
-  const defaultSettings = [];
+  const settings = [];
   [].forEach.call(inputs, input => {
     if (input.type === 'checkbox') {
-      defaultSettings.push({
+      settings.push({
         [input.name]: input.checked
       })
     } else if (input.type === 'radio') {
       if (input.checked) {
-        defaultSettings.push({
+        settings.push({
           [input.name]: input.value === 'true'
         })
       }
 
     } else {
-      defaultSettings.push({
+      settings.push({
         [input.name]: input.value
       })
     }
   })
   const selects = document.querySelectorAll('select');
   [].forEach.call(selects, select => {
-    defaultSettings.push({
+    settings.push({
       [select.name]: select.value
     })
   })
-  return defaultSettings
+  return settings
 }
 
 document.addEventListener('DOMContentLoaded', function () {
   chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
-    console.log('chromeShanbaySettings: ', settings)
+    debugLogger('log', 'chromeShanbaySettings: ', settings)
     if (Object.keys(settings).length) {
       renderOptions(settings.chromeShanbaySettings)
     } else {
@@ -70,16 +76,13 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.storage.sync.set({chromeShanbaySettings: _settings}, () => {
       console.log('lastError in options js: ', chrome.runtime.lastError)
       if (!chrome.runtime.lastError) {
-        // _settings.forEach(item => {
-        //   Object.assign(storage, item)
-        // })
         const saveRes = document.querySelector('#saveRes');
         saveRes.className = ''
         setTimeout(function () {
           saveRes.className = 'hide'
         }, 1000)
       }
-      console.log('chromeShanbaySettings settled.')
+      debugLogger('log', 'chromeShanbaySettings settled.')
     })
   }
 })
