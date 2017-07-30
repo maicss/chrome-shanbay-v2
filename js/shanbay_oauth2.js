@@ -1,12 +1,11 @@
 const AppConf = {
-  "client_id":"e7a33e28d619a5d1f7a3",
-};
+  'client_id': 'e7a33e28d619a5d1f7a3',
+}
 
 const ShanbayConf = {
-  "auth_url": "https://api.shanbay.com/oauth2/authorize/?response_type=token&client_id=",
-  "auth_success_url": "/oauth2/auth/success/"
-};
-
+  'auth_url': 'https://api.shanbay.com/oauth2/authorize/?response_type=token&client_id=',
+  'auth_success_url': '/oauth2/auth/success/'
+}
 
 function ShanbayOauth (client_id, conf) {
   this.client_id = client_id
@@ -41,12 +40,6 @@ ShanbayOauth.prototype.authorize = function (callback) {
 }
 
 ShanbayOauth.prototype.onAuthorize = function (tabId, changeInfo, tab) {
-  console.log(tabId, changeInfo, tab)
-  notify({
-    title: 'Authorized info',
-    message: `Authorize successfully`,
-    url: ``
-  })
   if (window.OAuth.tabId !== tabId)
     return false
 
@@ -58,7 +51,19 @@ ShanbayOauth.prototype.onAuthorize = function (tabId, changeInfo, tab) {
     localStorage.access_token = hash.access_token
     localStorage.expired_at = new Date((new Date()).getTime() + hash.expires_in * 1000)
     // todo 检测这个tab是不是存在，然后在关闭
-    chrome.tabs.remove(tabId)
+    chrome.tabs.get(tabId, function (tab) {
+      if (chrome.runtime.lastError) {
+        // 这个没啥意义
+        // debugLogger('error', chrome.runtime.lastError.message)
+      } else {
+        chrome.tabs.remove(tab.id)
+        notify({
+          title: 'Authorized info',
+          message: `Authorize successfully`,
+          url: ``
+        })
+      }
+    })
     if (window.OAuth.callback) {
       window.OAuth.callback()
     }
@@ -66,7 +71,6 @@ ShanbayOauth.prototype.onAuthorize = function (tabId, changeInfo, tab) {
 }
 
 ShanbayOauth.prototype.checkToken = function (force) {
-  console.log('in checkToken')
   if (!this.has_token()) {
     if (force) {
       this.authorize() // force authorize

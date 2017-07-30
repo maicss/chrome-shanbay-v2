@@ -1,6 +1,10 @@
 const bg = chrome.extension.getBackgroundPage()
 
 function renderUser () {
+  // let bg;
+  // chrome.runtime.getBackgroundPage(function (w) {
+  //   bg = w
+  // })
 
   function callback (user) {
     const header = document.querySelector('#header')

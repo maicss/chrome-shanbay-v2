@@ -1,11 +1,5 @@
-/**
- * @author Maicss, Joseph
- *
- * */
-
 let storage = {}
 window.oauth = ShanbayOauth.initPage()
-const token = oauth.access_token()
 /*=====================使用web音频接口播放音频的方法==================*/
 const context = new AudioContext()
 const playSound = url => {
@@ -22,6 +16,7 @@ const playSound = url => {
 /*=================================================================*/
 
 chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
+  const token = oauth.access_token()
   switch (req.action) {
     case 'authorize':
       oauth.authorize(sendResponse)
@@ -61,6 +56,12 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
         })
       })
       break
+    // case 'getBG':
+    //   console.log(window)
+    //   (function callbackWindow (a) {
+    //     a(window)
+    //   })(sendResponse)
+    //   break
   }
 })
 

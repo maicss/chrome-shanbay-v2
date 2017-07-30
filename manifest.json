@@ -2,9 +2,9 @@
   "name": "扇贝助手v2",
   "version": "0.0.1",
   "manifest_version": 2,
-  "description": "任意网页查询并加入生词本、背单词页面简洁、增加实用快捷键",
+  "description": "基于shanbay的网页查询并加入生词本应用",
   "icons": {
-    "48": "images/m.png"
+    "48": "images/icon_48.png"
   },
   "background": {
     "scripts": [
@@ -15,9 +15,9 @@
     "persistent": true
   },
   "browser_action": {
-    "default_icon": "images/m.png",
+    "default_icon": "images/icon_48.png",
     "default_popup": "popup.html",
-    "default_title": "扇贝助手增强版"
+    "default_title": "扇贝助手v2"
   },
   "content_scripts": [
     {
