@@ -17,6 +17,9 @@ const playSound = url => {
 
 chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
   const token = oauth.access_token()
+  if(!token) {
+    return chrome.tabs.sendMessage(sender.tab.id, {'action': 'lookup', data: {loading: true, msg: '没有检测到登陆信息，请<a href="https://www.shanbay.com">登陆</a>后点击插件图标认证。'}})
+  }
   switch (req.action) {
     case 'authorize':
       oauth.authorize(sendResponse)
