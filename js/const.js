@@ -1,10 +1,12 @@
-const devMode = !('update_url' in chrome.runtime.getManifest())
+const devMode = !('update_url' in chrome.runtime.getManifest());
 
+/**
+ * 开发模式的log打印
+ * @param level log的等级
+ * @param msg log信息
+ * 如果是必须打印的信息，就用console，如果只是调试的信息，就用debugLogger
+ * */
 const debugLogger = (level = 'log', ...msg) => {
-  /**
-   * 开发模式的log打印
-   * @param level log的等级
-   * @param msg log信息*/
   if (devMode) console[level](...msg)
 }
 
@@ -32,11 +34,11 @@ const notify = (opt = {}) => {
   }
   let noteID = Math.random().toString(36)
   chrome.notifications.create(noteID, options, (notifyID) => {
-    console.log(`notification [${notifyID}] was created`)
+    debugLogger('log', `notification [${notifyID}] was created`)
     hasNotified = true
   })
   chrome.notifications.onClicked.addListener(function (notifyID) {
-    console.log(`notification [${notifyID}] was clicked`)
+    debugLogger('log', `notification [${notifyID}] was clicked`)
     chrome.notifications.clear(notifyID)
     if (noteID === notifyID) {
       chrome.tabs.create({

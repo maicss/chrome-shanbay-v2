@@ -50,7 +50,6 @@ ShanbayOauth.prototype.onAuthorize = function (tabId, changeInfo, tab) {
     hash = JSON.parse('{"' + decodeURI(hash).replace(/&/g, '","').replace(/=/g, '":"') + '"}')
     localStorage.access_token = hash.access_token
     localStorage.expired_at = new Date((new Date()).getTime() + hash.expires_in * 1000)
-    // todo 检测这个tab是不是存在，然后在关闭
     chrome.tabs.get(tabId, function (tab) {
       if (chrome.runtime.lastError) {
         // 这个没啥意义

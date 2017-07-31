@@ -3,26 +3,26 @@ let offset = null
 let storage = {}
 
 //
-const getTodayTask = () => {
+const getDailyTask = () => {
   /**
    * 每小时检测一下今天的剩余单词数量
    * 必须登录扇贝之后才可以使用
-   * @return number word-last-number
    * */
   let taskTimer
   taskTimer = setInterval(function () {
     if (!storage.alarm && taskTimer) {
       clearInterval(taskTimer)
     } else {
+      debugLogger('log', 'send daily task request')
       chrome.runtime.sendMessage({
-        action: 'todayTask'
+        action: 'dailyTask'
       })
     }
   }, 1000 * 60 * 60 * 3)
 
 }
 
-getTodayTask()
+getDailyTask()
 
 chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
   debugLogger('info', 'chrome storage loaded')
@@ -64,7 +64,7 @@ const pendingSearchSelection = (e) => {
     if (matchResult) {
       popover({
         loading: true,
-        msg: '查询中....（请确保已登录扇贝网）'
+        msg: '查询中....（请确保已登录<a href="https://www.shanbay.com/">扇贝网</a>）'
       })
       debugLogger('info', 'get word: ', matchResult[0])
       chrome.runtime.sendMessage({
@@ -83,7 +83,7 @@ const popover = (res) => {
    * 弹出层逻辑处理器
    * 先在页面中插入需要的弹出框，然后根据不同状态插入不同的内容
    * 里面还有弹出框上的各种交互事件的处理函数
-   * @param data 需要弹出的数据和状态
+   * @param {object} res - 需要弹出的数据和状态
    * */
   if (!selectionParentBody) {
     pendingSearchSelection()
