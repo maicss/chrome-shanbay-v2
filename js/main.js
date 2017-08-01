@@ -1,12 +1,26 @@
+/**
+ * @requires ./const.js
+ * */
+
+/** 当前选区的父级body
+ * @type {DOM(body) | null}
+ * */
 let selectionParentBody = null
+/** 根据选区位置得到的弹出框的位置
+ * @type {object}
+ * @enum {number}
+ * */
 let offset = null
+/** 全局设置对象
+ * @type {object}
+ * */
 let storage = {}
 
 //
 const getDailyTask = () => {
   /**
-   * 每小时检测一下今天的剩余单词数量
-   * 必须登录扇贝之后才可以使用
+   * 每3小时检测一下今天的剩余单词数量, 必须登录扇贝之后才可以使用
+   * @function getDailyTask
    * */
   let taskTimer
   taskTimer = setInterval(function () {
@@ -24,6 +38,9 @@ const getDailyTask = () => {
 
 getDailyTask()
 
+/**
+ * 从chrome的storage里获取存储的插件的设置，如果有值，就给storage赋值，否者就使用默认的storageSettingMap
+ * */
 chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
   debugLogger('info', 'chrome storage loaded')
   if (Object.keys(settings).length) {
@@ -34,8 +51,10 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
     storage = storageSettingMap
   }
 })
-
-chrome.storage.onChanged.addListener(function (changes, areaName) {
+/**
+ * 监听设置变化的事件，如果修改了设置，就更新全局的storage的值
+ * */
+chrome.storage.onChanged.addListener(function (changes) {
   debugLogger('info', 'chrome storage changed')
   storage = {}
   changes.chromeShanbaySettings.newValue.forEach(item => {
@@ -45,10 +64,10 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
 
 const pendingSearchSelection = (e) => {
   /**
-   * 双击事件的监听器。
-   * 处理选中区域，决定是否发出请求和弹出弹出框
+   * 双击事件和右键选中后的事件处理器。
+   * @function pendingSearchSelection
+   * @param {object}[e] - 双击事件的对象
    * 兼容性: node.getRootNode: chrome 54+
-   * @param e 事件对象
    * */
   const _popover = document.querySelector('#shanbay-popover')
   if (_popover) {
@@ -80,26 +99,30 @@ const pendingSearchSelection = (e) => {
 
 const popover = (res) => {
   /**
-   * 弹出层逻辑处理器
-   * 先在页面中插入需要的弹出框，然后根据不同状态插入不同的内容
-   * 里面还有弹出框上的各种交互事件的处理函数
-   * @param {object} res - 需要弹出的数据和状态
+   * 根据参数和设置渲染弹出框，并处理弹出框上的各种事件
+   * @function popover
+   * @param {object} res
+   * @param {boolean} [res.loading] - 查询前的准备状态和未登录的提示
+   * @param {object} [res.data] - 查询结果
    * */
+  /** 如果全局的父级body不存在，使用pendingSearchSelection查找父级body，是右键查询，非事件触发使用的*/
   if (!selectionParentBody) {
     pendingSearchSelection()
   }
 
-  // 先获取到弹窗应该出现的位置
+  /** 先根据选区确定弹出框的位置，生成弹出框，然后根据参数和设置，往里面插入内容*/
   let html = `<div id="shanbay-popover" style="top: ${offset.top}px; left: ${offset.left}px; display: block" class="fade bottom in popover"><div class="arrow" style= ${offset.distance ? 'left:' + offset.distance + 'px' : ''}></div><div class="popover-inner"><div class="popover-title" style="border: none;"></div></div></div>`
 
+  /** 这里是为了防止多次调用popover产生多个弹出框的。因为一次查询最起码会调用两次popover*/
   if (!document.querySelector('#shanbay-popover')) {
     selectionParentBody.insertAdjacentHTML('beforeEnd', html)
   }
 
   if (res.loading) {
-    // 查询之前的提示
+    /** 查询之前和未登录的提示信息*/
     document.querySelector('#shanbay-popover .popover-title').innerHTML = res.msg
   } else if (res.status_code === 0) {
+    /** 查询单词或者单词其他操作成功*/
     let data = res.data
     let contentHtml = `
 <div class="popover-title">
@@ -129,15 +152,15 @@ const popover = (res) => {
 
     document.querySelector('#shanbay-popover .popover-inner').innerHTML = contentHtml;
 
-    // 各种点击事件的处理
-    // 发音事件的处理
+    /** 各种事件的处理*/
+    /** 发音事件的处理 */
     [].forEach.call(document.querySelectorAll('#shanbay-popover .speaker'), (speaker) => {
       speaker.addEventListener('click', function () {
         chrome.runtime.sendMessage({action: 'playSound', url: this.dataset.target})
       })
     })
 
-    // 添加单词和我忘了的事件处理
+    /** 添加单词和忘记单词的事件处理*/
     if (data.learning_id) {
       document.querySelector('#shanbay-forget-word').addEventListener('click', function () {
         chrome.runtime.sendMessage({action: 'forgetWord', learningId: data.learning_id})
@@ -157,16 +180,18 @@ const popover = (res) => {
     }
 
   } else if (res.status_code === 1) {
+    /** 查询单词或单词的其他操作失败*/
     // 查询正常，但是没有这个单词
     document.querySelector('#shanbay-popover .popover-inner').innerHTML = '<div class="popover-title" style="border: none;">没有找到这个单词</div>'
   } else {
+    /** 未预料的状态*/
     let m = 'unHandle response!!! Please tell <a href="https://github.com/maicss/chrome-shanbay-v2/issues">me</a> which word you lookup, thanks.'
     document.querySelector('#shanbay-popover .popover-title').innerHTML = m
     console.error(m, JSON.stringify(res))
   }
 }
 
-// background 交互返回信息的处理
+/** 与background 交互，返回信息的处理*/
 chrome.runtime.onMessage.addListener(function (res, sender) {
   let addResult
   switch (res.action) {
@@ -199,34 +224,41 @@ chrome.runtime.onMessage.addListener(function (res, sender) {
 const getSelectionPosition = (range) => {
   /**
    * 得到弹出框的绝对位置 和 弹出框箭头的位置
-   * @param range Range的实例
-   * @return left, top 弹出框的位置; distance, 箭头的偏移量*/
+   * @function getSelectionPosition
+   * @param {object} range Range的实例
+   * @example
+   * return {left: 100, top: 100, distance: 10}
+   * @return {object<string:number>} left, top 弹出框的位置; distance, 箭头的偏移量
+   * */
+  /** 选区的范围数据*/
   let {left, top, height, width} = range.getBoundingClientRect()
-  // left += width / 2
+  /** 280 是弹出框设置的宽度*/
+  const popupWidth = 280
   // 这里的22px是为了和单词保持一定距离
   // popup 宽度为280px, 然后算上选区的宽度，让箭头置中
   let windowWidth = left + width
-  left = left - (280 - width) / 2
+  left = left - (popupWidth - width) / 2
   top += (height + window.scrollY)
   // 处理单词靠边，popup 超出屏幕范围的情况
   // 140 是箭头原始的位置, 也就是popup宽度的一半
   let distance = 0
   if (left < 0) {
-    distance = 140 + left
+    distance = popupWidth / 2 + left
     left = 0
-  } else if (left + 280 > window.innerWidth) {
+  } else if (left + popupWidth > window.innerWidth) {
     // 这里的10是为里防止右边边界出现的三角箭头出现在弹出框外面的情况，纯粹为了美观
     // 最终的效果就是单词在右边边界的时候，会跟浏览器的边框有一定的距离，因为排版的原因，右边可能空出一大截，而且不会对齐，但是浏览器左边肯定都是对齐的，所以弹出框在左边的时候，一定是靠在浏览器边界的。
-    distance = 140 + (left + 280 - windowWidth) - 10
-    left = windowWidth + 10 - 280
+    distance = popupWidth / 2 + (left + popupWidth - windowWidth) - 10
+    left = windowWidth + 10 - popupWidth
   }
   return {left, top, distance}
 }
 
 const hidePopover = (delay) => {
   /**
-   * 隐藏弹出框的方法
-   * @param delay, ms 隐藏弹出框的延迟
+   * 隐藏弹出框
+   * @function hidePopover
+   * @param {number} delay, ms 隐藏弹出框的延迟
    * */
   setTimeout(function () {
     selectionParentBody.removeChild(document.querySelector('#shanbay-popover'))
@@ -239,7 +271,7 @@ if (document.addEventListener || event.type === 'load' || document.readyState ==
   console.log('Shanbay Extension DOMContentLoaded......')
   document.addEventListener('dblclick', pendingSearchSelection)
   document.addEventListener('click', function (e) {
-    // 屏蔽弹出框的双击事件
+    /** 屏蔽弹出框的双击事件*/
     const _popover = document.querySelector('#shanbay-popover')
     if (_popover && selectionParentBody) {
       if (!e.path.some(ele => ele === _popover)) {

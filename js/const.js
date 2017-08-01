@@ -1,10 +1,22 @@
+
+/**
+ * @author maicss
+ * @file some licences file
+ * @copyright 2017 maicss
+ * */
+
+/** 检测是否是开发模式，用来控制日志的输出
+ * @type {boolean}
+ * */
 const devMode = !('update_url' in chrome.runtime.getManifest());
 
 /**
  * 开发模式的log打印
- * @param level log的等级
- * @param msg log信息
- * 如果是必须打印的信息，就用console，如果只是调试的信息，就用debugLogger
+ * @function debugLogger
+ * @param {string} level=log 属于console的任何log的等级
+ * @default log
+ * @param {*} msg log信息
+ * @summary 如果是任何情况下都要打印的信息，就用console，如果只是调试的信息，就用debugLogger
  * */
 const debugLogger = (level = 'log', ...msg) => {
   if (devMode) console[level](...msg)
@@ -17,8 +29,12 @@ const debugLogger = (level = 'log', ...msg) => {
 
 const notify = (opt = {}) => {
   /**
-   * chrome 通知处理方法
-   * 传入的参数就是chrome notifications的参数
+   * chrome 通知处理方法, 传入的参数就是chrome notifications的参数
+   * @function notify
+   * @param {object} opt={} - chrome notifications 的参数
+   * @param {string} opt.title=人丑多读书 notifications title
+   * @param {string} opt.message=少壮不努力，老大背单词 notifications message
+   * @param {string} opt.url=https://www.shanbay.com/ notifications url, notifications可以点击跳转
    * */
   opt = {
     title: opt.title || '人丑多读书',
@@ -51,9 +67,12 @@ const notify = (opt = {}) => {
 
 const request = (url, options = {}) => {
   /**
-   * 基于fetch的网络请求方法的封装
-   * 只有两种数据的返回，buffer和json，因为这个应用里面只用到了这两种
-   * @param 和fetch一样
+   * 基于fetch的网络请求方法的封装，只有两种数据的返回，buffer和json，因为这个应用里面只用到了这两种
+   * @function request
+   * @see [use fetch API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch}
+   * @param {string} url - request url
+   * @param {object} options={} - fetch options
+   * @param {string} [options.type='buffer'] - whether need return buffer
    * @return Promise
   * */
   return fetch(url, options).then(res => {
@@ -67,22 +86,32 @@ const request = (url, options = {}) => {
   }).catch(e => debugLogger('error', `[${new Date().toLocaleDateString()}] fetch failed ${options.method || 'GET'} ${url} ${JSON.stringify(e)}`))
 }
 
-// shanbay API v2的需要用到的方法，没什么用，只是一个参考
 const shanbayAPI = {
+  /**
+   * shanbay API的需要用到的方法，没什么用，只是一个参考
+   * @constant
+   * @readonly
+   * @enum {object}
+   * */
+
+  /** 获取用户信息*/
   userInfo: {
     method: 'GET',
     url: 'https://api.shanbay.com/account/?access_token='
   },
+  /** 查询单词*/
   lookUp: {
     method: 'GET',
     url: 'https://api.shanbay.com/bdc/search/?word={word}&access_token=',
     params: ['word']
   },
+  /** 添加一个单词到单词本*/
   add: {
     method: 'POST',
     url: 'https://api.shanbay.com/bdc/learning/?access_token=',
     params: ['id']
   },
+  /** 重置一个单词的熟练度*/
   forget: {
     method: 'PUT',
     url: ' https://api.shanbay.com/bdc/learning/{learning_id}/?access_token=',
@@ -91,10 +120,11 @@ const shanbayAPI = {
 }
 
 /**
- * localStorageSpecification 存放到localStorage的配置
- * 只存取第一个键值对
- * desc 是这个键值对的描述
- * enum 是这个键的取值范围
+ * 扩展设置的名称、名称的说明、取值范围的数组
+ * @namespace {Array} extensionSpecification
+ * @property {string} * - 各种名称
+ * @property {string} desc - 名称的说明
+ * @property {Array} enum - 取值范围
  * */
 const extensionSpecification = [
   // {'content-sentence': false, desc: '是否显示例句', enum: [true, false]},
@@ -106,31 +136,56 @@ const extensionSpecification = [
   {'autoRead': 'false', desc: '自动发音', enum: ['EN', 'US', 'false']},
   {'paraphrase': 'bilingual', desc: '默认释义', enum: ['Chinese', 'English', 'bilingual']}
 ]
-// 这个是上面的实际用来存储的数据
+/**
+ * 由extensionSpecification去除描述和取值范围之后生成的真正能使用的数组
+ * a array of {settingName: value}
+ * @type {Array}
+ * @see extensionSpecification
+ * */
 const storageSettingArray = extensionSpecification.map(setting => {
   delete setting.enum
   delete setting.desc
   return setting
 })
 
-// 这个是上面数据的Map化，只是为了用起来更方便一点
+/**
+ * 由storageSettingArray数组生成的map
+ * @type {Object}
+ * */
 let storageSettingMap = {};
 storageSettingArray.forEach(item => {
   Object.assign(storageSettingMap, item)
 })
 
-/**
- * 构造所有需要跟shanbay交互的方法
- * 所有的方法的返回值都是promise
- * */
+
 const userInfo = (token) => {
+  /**
+   * 获取用户信息
+   * @function userInfo
+   * @param {string} token - 用户token
+   * @return {object} Promise
+   * */
   return request(shanbayAPI.userInfo.url + token)
 }
 
 const lookUp = (word, token) => {
+  /**
+   * 查询单词
+   * @function lookUp
+   * @param {string} word - 需要查询的单词
+   * @param {string} token - 用户token
+   * @return {object} Promise
+   * */
   return request((shanbayAPI.lookUp.url + token).replace('{word}', word))
 }
 const addWord = (id, token) => {
+  /**
+   * 添加单词
+   * @function addWord
+   * @param {number} id - 单词ID
+   * @param {string} token - 用户token
+   * @return {object} Promise
+   * */
   return request(shanbayAPI.add.url + token, {
     method: shanbayAPI.add.method,
     headers: {
@@ -140,6 +195,13 @@ const addWord = (id, token) => {
   })
 }
 const forget = (learningId, token) => {
+  /**
+   * 忘记单词
+   * @function forget
+   * @param {number} learningId - 单词的learningId
+   * @param {string} token - 用户token
+   * @return {object} Promise
+   * */
   return request((shanbayAPI.forget.url + token).replace('{learning_id}', learningId), {
     method: shanbayAPI.forget.method,
     headers: {'Content-Type': 'application/json'},
