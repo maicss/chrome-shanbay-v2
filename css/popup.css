@@ -63,7 +63,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 1010;
+    z-index: 10100;
     display: none;
     max-width: 276px;
     padding: 1px;
@@ -81,6 +81,8 @@
 }
 
 #shanbay-popover .popover-title {
+    width: 270px;
+    background-color: white;
     margin: 0;
     padding: 8px 14px;
     font-size: 14px;
@@ -133,11 +135,6 @@
     width: 280px;
     overflow: hidden;
     border-radius: 6px;
-}
-
-#shanbay-popover .popover-title {
-    width: 246px;
-    background-color: white;
 }
 
 #shanbay-popover .popover-title .word {
