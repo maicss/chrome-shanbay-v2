@@ -1,4 +1,3 @@
-let storage = {}
 window.oauth = ShanbayOauth.initPage()
 /*=====================使用web音频接口播放音频的方法==================*/
 const context = new AudioContext()
@@ -83,6 +82,7 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
 
 chrome.contextMenus.removeAll(function () {
   if (storage.contextLookup) {
+    const token = oauth.access_token()
     chrome.contextMenus.create({
       title: '在扇贝网中查找%s',
       contexts: ['selection'],

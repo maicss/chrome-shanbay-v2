@@ -1,7 +1,3 @@
-/**
- * @requires ./const.js
- * */
-
 /** 当前选区的父级body
  * @type {DOM(body) | null}
  * */
@@ -11,12 +7,22 @@ let selectionParentBody = null
  * @enum {number}
  * */
 let offset = null
-/** 全局设置对象
- * @type {object}
- * */
-let storage = {}
 
-//
+/**
+ * 从chrome的storage里获取存储的插件的设置，如果有值，就给storage赋值，否者就使用默认的storageSettingMap
+ * */
+chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
+  debugLogger('info', 'chrome storage loaded')
+  if (Object.keys(settings).length) {
+    settings.chromeShanbaySettings.forEach(item => {
+      Object.assign(storage, item)
+    })
+  } else {
+    storage = storageSettingMap
+  }
+  getDailyTask()
+})
+
 const getDailyTask = () => {
   /**
    * 每3小时检测一下今天的剩余单词数量, 必须登录扇贝之后才可以使用
@@ -36,21 +42,7 @@ const getDailyTask = () => {
 
 }
 
-getDailyTask()
 
-/**
- * 从chrome的storage里获取存储的插件的设置，如果有值，就给storage赋值，否者就使用默认的storageSettingMap
- * */
-chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
-  debugLogger('info', 'chrome storage loaded')
-  if (Object.keys(settings).length) {
-    settings.chromeShanbaySettings.forEach(item => {
-      Object.assign(storage, item)
-    })
-  } else {
-    storage = storageSettingMap
-  }
-})
 /**
  * 监听设置变化的事件，如果修改了设置，就更新全局的storage的值
  * */

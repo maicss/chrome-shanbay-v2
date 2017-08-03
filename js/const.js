@@ -5,9 +5,16 @@
  * @copyright 2017 maicss
  * */
 
+/**
+ * 全局设置对象
+ * @type {object}
+ * */
+let storage = {}
+
 /** 检测是否是开发模式，用来控制日志的输出
  * @type {boolean}
  * */
+
 const devMode = !('update_url' in chrome.runtime.getManifest());
 
 /**
@@ -134,7 +141,9 @@ const extensionSpecification = [
   {'alarm': true, desc: '定时提醒', enum: [true, false]},
   {'reminderContent': '少壮不努力，老大背单词', desc: '提示框内容',},
   {'autoRead': 'false', desc: '自动发音', enum: ['EN', 'US', 'false']},
-  {'paraphrase': 'bilingual', desc: '默认释义', enum: ['Chinese', 'English', 'bilingual']}
+  {'paraphrase': 'bilingual', desc: '默认释义', enum: ['Chinese', 'English', 'bilingual']},
+  {'avatar': true, desc: 'Github动态页面显示头像', enum: [true, false]},
+  {'trend': true, desc: '添加Github trend导航', enum: [true, false]},
 ]
 /**
  * 由extensionSpecification去除描述和取值范围之后生成的真正能使用的数组
