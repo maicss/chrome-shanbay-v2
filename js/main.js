@@ -121,11 +121,12 @@ const popover = (res) => {
     <span class="word">${data.content}</span>
     <a href="https://www.shanbay.com/bdc/vocabulary/${data.id}" style="float: right;" target="_blank"> 详细</a>
     <div>
-        ${data.pronunciations.us ? `<span>us: </span><small>/${data.pronunciations.us}/</small>
-        <span class="speaker" data-target="${data.us_audio}"></span>` : ''}
         
         ${data.pronunciations.uk ? `<span>uk: </span><small>/${data.pronunciations.uk}/</small>
         <span class="speaker" data-target="${data.uk_audio}"></span>` : ''}
+        
+        ${data.pronunciations.us ? `<span>us: </span><small>/${data.pronunciations.us}/</small>
+        <span class="speaker" data-target="${data.us_audio}"></span>` : ''}
         
     </div>
 </div>
