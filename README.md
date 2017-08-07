@@ -4,6 +4,8 @@
 
 是[jinntrance/shanbay-crx](https://github.com/jinntrance/shanbay-crx)的重构版
 
+chrome商店地址：https://chrome.google.com/webstore/detail/%E6%89%87%E8%B4%9D%E5%8A%A9%E6%89%8Bv2/pkibohmmnmpgbnaoappgndlfncanookc
+
 
 ## 和原版的区别：
 - 没有Webster了
