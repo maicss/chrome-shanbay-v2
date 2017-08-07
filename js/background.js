@@ -41,11 +41,31 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
     case 'playSound':
       playSound(req.url)
       break
-    case 'dailyTask':
+    // case 'getBG':
+    //   console.log(window)
+    //   (function callbackWindow (a) {
+    //     a(window)
+    //   })(sendResponse)
+    //   break
+  }
+})
+
+
+const getDailyTask = () => {
+  /**
+   * 每3小时检测一下今天的剩余单词数量, 必须登录扇贝之后才可以使用
+   * @function getDailyTask
+   * */
+  let taskTimer
+  taskTimer = setInterval(function () {
+    if (!storage.alarm && taskTimer) {
+      clearInterval(taskTimer)
+    } else {
+      debugLogger('log', 'send daily task request')
       chrome.cookies.get({url: 'https://www.shanbay.com/bdc/review/', name: 'auth_token'}, function (cookies) {
         request('https://www.shanbay.com/api/v1/bdc/stats/today/', {credentials: 'include'}).then(r => {
 
-          if (r.count === 0) {
+          if (r.data.num_left === 0) {
             chrome.browserAction.setBadgeText({text: ''})
           } else {
             chrome.browserAction.setBadgeText({text: r.data.num_left + ''})
@@ -57,15 +77,10 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
 
         })
       })
-      break
-    // case 'getBG':
-    //   console.log(window)
-    //   (function callbackWindow (a) {
-    //     a(window)
-    //   })(sendResponse)
-    //   break
-  }
-})
+    }
+  }, 1000 * 60 * 60 * 3)
+
+}
 
 
 chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
@@ -76,6 +91,7 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
   } else {
     storage = storageSettingMap
   }
+  getDailyTask()
 })
 
 // contentMenu

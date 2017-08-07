@@ -20,28 +20,7 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
   } else {
     storage = storageSettingMap
   }
-  getDailyTask()
 })
-
-const getDailyTask = () => {
-  /**
-   * 每3小时检测一下今天的剩余单词数量, 必须登录扇贝之后才可以使用
-   * @function getDailyTask
-   * */
-  let taskTimer
-  taskTimer = setInterval(function () {
-    if (!storage.alarm && taskTimer) {
-      clearInterval(taskTimer)
-    } else {
-      debugLogger('log', 'send daily task request')
-      chrome.runtime.sendMessage({
-        action: 'dailyTask'
-      })
-    }
-  }, 1000 * 60 * 60 * 3)
-
-}
-
 
 /**
  * 监听设置变化的事件，如果修改了设置，就更新全局的storage的值
