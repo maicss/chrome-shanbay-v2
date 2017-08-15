@@ -34,6 +34,10 @@
     text-decoration: none;
 }
 
+#shanbay-add-word {
+    min-height: unset;
+}
+
 #shanbay-popover .btn {
     display: inline-block;
     padding: 4px 12px;
@@ -88,8 +92,6 @@
 }
 
 #shanbay-popover .popover-title {
-    /*box-sizing: content-box;*/
-    width: 244px;
     background-color: white;
     margin: 0;
     padding: 8px 14px;
@@ -97,7 +99,6 @@
     font-weight: normal;
     line-height: 18px;
     border-bottom: 1px solid #ebebeb;
-    /*border-radius: 5px 5px 0 0;*/
 }
 
 #shanbay-popover .popover-content {
