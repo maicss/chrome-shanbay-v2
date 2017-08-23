@@ -34,6 +34,9 @@ chrome商店地址：https://chrome.google.com/webstore/detail/%E6%89%87%E8%B4%9
 - 有些词语的释义渲染的很差。这个锅主要由扇贝的API来背……
 - 网页中嵌套iframe的时候，不能正确触发事件。这个不打算处理。因为默认的获取选区方法是获取当前顶级文档下的选区。想要获取frame的选区必须得到frame的文档，但是页面不知道会嵌入多少个文档，所以这个很难处理。现在还在广泛使用嵌入frame的网页有网页播放器，网页邮箱，在一个网站获取一个社交的网站动态（比如微博）等。一个嵌套了frame的网页，对于用户来说，一眼是看不出来的。这个也不想弹出一个警告什么的，太丑了。所以，let it go吧。
 - 刷新插件之后，页面不刷新，双击查词的时候，会出现找不到对象的错误。这个没搜到解决方案，官方开发论坛也说try...catch掉，然后就没有然后了……也就是说没有解决方案。而且正常使用不会出现这个问题的，是debug的时候才有，就算了吧。
+- 在input和textarea里面双击的时候，能查询单词，但是弹出框的定位是在页面的左上角。这个是因为selection API在这两个里面获取到选区的offset就是俩0。也搜到了一些hack的方法，但是修改页面的DOM特别多（要做一个contentedible的div替换掉原来的textarea，然后再用其他标签动态插入定位blabla）这样会还要考虑原来可能有的表单提交什么的。也let it go得了。
+
+
 
 ## 吐槽：
 
@@ -55,3 +58,9 @@ chrome商店地址：https://chrome.google.com/webstore/detail/%E6%89%87%E8%B4%9
 - Web Audio API
 - Mutations／MutationObserver
 - JSDOC
+
+## 改进的空间
+
+- setting页面的样式
+- 可以使用persistent为false，然后全用事件机制运行，这样可以节省电量和计算资源
+

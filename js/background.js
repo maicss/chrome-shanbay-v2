@@ -62,7 +62,7 @@ const getDailyTask = () => {
       clearInterval(taskTimer)
     } else {
       debugLogger('log', 'send daily task request')
-      chrome.cookies.get({url: 'https://www.shanbay.com/bdc/review/', name: 'auth_token'}, function (cookies) {
+      chrome.cookies.get({url: 'https://www.shanbay.com/bdc/review/', name: 'auth_token'}, function () {
         request('https://www.shanbay.com/api/v1/bdc/stats/today/', {credentials: 'include'}).then(r => {
 
           if (r.data.num_left === 0) {
@@ -75,7 +75,7 @@ const getDailyTask = () => {
             })
           }
 
-        })
+        }).catch(e => debugLogger('error', 'get daily task failed, cause: ', e))
       })
     }
   }, 1000 * 60 * 60 * 3)

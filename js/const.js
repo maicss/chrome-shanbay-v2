@@ -87,6 +87,9 @@ const request = (url, options = {}) => {
       if (options.type === 'buffer') return res.arrayBuffer()
       return res.json()
     } else {
+      if (res.status === 401) {
+        notify({title: '扇贝网登录信息已过期', message: '请点击本通知或去扇贝网重新登录，否者将不能使用添加单词、右键查词和背单词提醒等功能。'})
+      }
       debugLogger('error', `[${new Date().toLocaleDateString()}] request failed ${options.method || 'GET'} ${url} ${JSON.stringify(res)}`)
       return Promise.reject(res)
     }
@@ -134,7 +137,6 @@ const shanbayAPI = {
  * @property {Array} enum - 取值范围
  * */
 const extensionSpecification = [
-  // {'content-sentence': false, desc: '是否显示例句', enum: [true, false]},
   {'clickLookup': true, desc: '双击选中查词', enum: [true, false]},
   {'contextLookup': true, desc: '右键查词', enum: [true, false]},
   {'addBook': false, desc: '默认添加到单词本', enum: [true, false]},
