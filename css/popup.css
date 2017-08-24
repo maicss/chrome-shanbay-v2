@@ -69,11 +69,12 @@
 
 #shanbay-popover.popover {
     position: absolute;
+    box-sizing: border-box;
     top: 0;
     left: 0;
     z-index: 101000;
     display: none;
-    max-width: 276px;
+    max-width: 280px;
     padding: 1px;
     text-align: left;
     background-color: #fff;

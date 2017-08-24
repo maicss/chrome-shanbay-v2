@@ -100,7 +100,7 @@ chrome.contextMenus.removeAll(function () {
   if (storage.contextLookup) {
     const token = oauth.access_token()
     chrome.contextMenus.create({
-      title: '在扇贝网中查找%s',
+      title: '在扇贝网中查找 %s',
       contexts: ['selection'],
       onclick: function (info, tab) {
         lookUp(info.selectionText, token).then(res => {

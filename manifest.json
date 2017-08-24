@@ -1,6 +1,6 @@
 {
   "name": "扇贝助手v2",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "author": "maicss, jinntrance",
   "manifest_version": 2,
   "description": "基于shanbay API的网页查询并加入单词到生词本的应用。并添加了GitHub首页头像和trend功能",
@@ -31,7 +31,13 @@
         "js/main.js"
       ],
       "matches": ["<all_urls>"],
-      "exclude_matches": ["*://*.shanbay.com/*", "*://*.hjenglish.com/*"]
+      "exclude_matches": [
+        "*://*.shanbay.com/*", 
+        "*://*.hjenglish.com/*", 
+        "*://*.codepen.io/*",
+        "*://*.jsfiddle.net/*",
+        "*://*.jsbin.com/*"
+      ]
     },
     {
       "js": [
