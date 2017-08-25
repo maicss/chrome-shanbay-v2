@@ -6,7 +6,7 @@ const actionArr = ['starred', 'created', 'forked', 'watched', 'follow']
 
 const addTends = () => {
   // const tendUrl = 'https://github.com/trending'
-  document.querySelector('div.header ul[role=navigation]').insertAdjacentHTML('beforeEnd', '<li><a class="js-selected-navigation-item header-navlink" href="/trending">trending</a></li>')
+  document.querySelector('header.Header ul[role=navigation]').insertAdjacentHTML('beforeEnd', '<li><a class="js-selected-navigation-item HeaderNavlink px-2" href="/trending">trending</a></li>')
 }
 /**
  * GitHub 动态首页添加头像
