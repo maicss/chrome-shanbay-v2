@@ -38,7 +38,7 @@
     min-height: unset;
 }
 
-#shanbay-popover .btn {
+#shanbay-popover .shanbay-btn {
     display: inline-block;
     padding: 4px 12px;
     margin-bottom: 0;
@@ -59,15 +59,15 @@
     border-radius: 2px;
 }
 
-#shanbay-popover .btn-success:hover,
-#shanbay-popover .btn-success:focus,
-#shanbay-popover .btn-success:active,
-#shanbay-popover .btn-success.active {
+#shanbay-popover .shanbay-btn:hover,
+#shanbay-popover .shanbay-btn:focus,
+#shanbay-popover .shanbay-btn:active,
+#shanbay-popover .shanbay-btn.active {
     color: #fff;
     background-color: #38c2a8;
 }
 
-#shanbay-popover.popover {
+#shanbay-popover {
     position: absolute;
     box-sizing: border-box;
     top: 0;
@@ -85,14 +85,14 @@
     white-space: normal;
     visibility: visible;
     overflow: visible;
-}
-
-#shanbay-popover.popover.bottom {
     margin-top: 10px;
     bottom: unset;
+    opacity: 1;
+    height: initial;
+    transition: opacity 0.15s linear;
 }
 
-#shanbay-popover .popover-title {
+#shanbay-popover #shanbay-title {
     background-color: white;
     margin: 0;
     padding: 8px 14px;
@@ -102,12 +102,21 @@
     border-bottom: 1px solid #ebebeb;
 }
 
-#shanbay-popover .popover-content {
+#shanbay-popover #shanbay-content {
     padding: 9px 14px;
 }
 
-#shanbay-popover.popover .arrow,
-#shanbay-popover.popover .arrow:after {
+#shanbay-popover #shanbay-content .simple-definition {
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+#shanbay-popover #shanbay-content .add {
+    text-align: right;
+}
+
+#shanbay-popover #shanbay-arrow,
+#shanbay-popover #shanbay-arrow:after {
     content: "";
     position: absolute;
     display: block;
@@ -116,16 +125,16 @@
     border: 10px transparent solid;
 }
 
-#shanbay-popover.popover .arrow {
+#shanbay-popover #shanbay-arrow {
     border-width: 11px;
 }
 
-#shanbay-popover .popover-content p {
+#shanbay-popover #shanbay-content p {
     margin: 0;
     padding: 0;
 }
 
-#shanbay-popover.popover.bottom .arrow {
+#shanbay-popover #shanbay-arrow {
     left: 50%;
     margin-left: -11px;
     border-top-width: 0;
@@ -133,14 +142,14 @@
     top: -11px;
 }
 
-#shanbay-popover.popover.bottom .arrow:after {
+#shanbay-popover #shanbay-arrow:after {
     top: 1px;
     margin-left: -10px;
     border-top-width: 0;
     border-bottom-color: #fff;
 }
 
-#shanbay-popover .popover-inner {
+#shanbay-popover #shanbay-inner {
     padding: 0;
     width: 276px;
     overflow: hidden;
@@ -149,18 +158,8 @@
     box-shadow: none;
 }
 
-#shanbay-popover .popover-title .word {
+#shanbay-popover #shanbay-title .word {
     font-size: 25px;
     font-weight: normal;
     font-family: Lucida Sans Unicode, Lucida Grande, sans-serif;
-}
-
-#shanbay-popover.fade {
-    opacity: 0;
-    transition: opacity 0.15s linear;
-}
-
-#shanbay-popover.fade.in {
-    opacity: 1;
-    height: initial;
 }

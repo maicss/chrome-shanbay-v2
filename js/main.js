@@ -82,7 +82,7 @@ const popover = (res) => {
   }
 
   /** 先根据选区确定弹出框的位置，生成弹出框，然后根据参数和设置，往里面插入内容*/
-  let html = `<div id="shanbay-popover" style="top: ${offset.top}px; left: ${offset.left}px; display: block" class="fade bottom in popover"><div class="arrow" style= ${offset.distance ? 'left:' + offset.distance + 'px' : ''}></div><div class="popover-inner"><div class="popover-title" style="border: none;"></div></div></div>`
+  let html = `<div id="shanbay-popover" style="top: ${offset.top}px; left: ${offset.left}px; display: block"><div id="shanbay-arrow" style= ${offset.distance ? 'left:' + offset.distance + 'px' : ''}></div><div id="shanbay-inner"><div id="shanbay-title" style="border: none;"></div></div></div>`
 
   /** 这里是为了防止多次调用popover产生多个弹出框的。因为一次查询最起码会调用两次popover*/
   if (!document.querySelector('#shanbay-popover')) {
@@ -91,12 +91,12 @@ const popover = (res) => {
 
   if (res.loading) {
     /** 查询之前和未登录的提示信息*/
-    document.querySelector('#shanbay-popover .popover-title').innerHTML = res.msg
+    document.querySelector('#shanbay-popover #shanbay-title').innerHTML = res.msg
   } else if (res.status_code === 0) {
     /** 查询单词或者单词其他操作成功*/
     let data = res.data
     let contentHtml = `
-<div class="popover-title">
+<div id="shanbay-title">
     <span class="word">${data.content}</span>
     <a href="https://www.shanbay.com/bdc/vocabulary/${data.id}" style="float: right;" target="_blank"> 详细</a>
     <div>
@@ -109,20 +109,20 @@ const popover = (res) => {
         
     </div>
 </div>
-<div class="popover-content">
-    <div class="simple-definition" style="margin-bottom: 20px; font-size: 16px;">
+<div id="shanbay-content">
+    <div class="simple-definition">
         ${storage.paraphrase !== 'English' ? (data.cn_definition.pos ? `<div><strong>${data.cn_definition.pos} </strong><span>${data.cn_definition.defn}</span></div>` : data.cn_definition.defn ? data.cn_definition.defn.split('\n').join('<br>') : '' ) : ''}
         ${ storage.paraphrase !== 'Chinese' ? Object.keys(data.en_definitions).map(pos => `<div><span>${pos}. </span><span>${data.en_definitions[pos].join(';')}</span></div>`).join('') : ''}
     </div>
-    <div class="add" style="text-align: right;">
-        ${data.learning_id ? `<p id="shanbay-forget-word"><button class="forget pull-right btn btn-success">我忘了</button></p>` : `<p><button id="shanbay-add-word" class="btn btn-success">添加</button></p>`}
-        <p class="hide" id="shanbay-under-adding" style="text-align: right;"><span class="loading">正在添加</span></p>
+    <div class="add">
+        ${data.learning_id ? `<p id="shanbay-forget-word"><button class="forget shanbay-btn">我忘了</button></p>` : `<p><button id="shanbay-add-word" class="shanbay-btn">添加</button></p>`}
+        <p class="hide" id="shanbay-under-adding"><span class="loading">正在添加</span></p>
     </div>
     <div id="shanbay-add-result" class="hide"></div>
 </div>
   `
 
-    document.querySelector('#shanbay-popover .popover-inner').innerHTML = contentHtml;
+    document.querySelector('#shanbay-popover #shanbay-inner').innerHTML = contentHtml;
 
     /** 各种事件的处理*/
     /** 发音事件的处理 */
@@ -154,11 +154,11 @@ const popover = (res) => {
   } else if (res.status_code === 1) {
     /** 查询单词或单词的其他操作失败*/
     // 查询正常，但是没有这个单词
-    document.querySelector('#shanbay-popover .popover-inner').innerHTML = '<div class="popover-title" style="border: none;">没有找到这个单词</div>'
+    document.querySelector('#shanbay-popover #shanbay-inner').innerHTML = '<div id="shanbay-title" style="border: none;">没有找到这个单词</div>'
   } else {
     /** 未预料的状态*/
-    let m = 'unHandle response!!! Please tell <a href="https://github.com/maicss/chrome-shanbay-v2/issues">me</a> which word you lookup, thanks.'
-    document.querySelector('#shanbay-popover .popover-title').innerHTML = m
+    let m = '哇塞，非常罕见的错误哎，请 <a href="https://github.com/maicss/chrome-shanbay-v2/issues">告诉我</a>你怎么发现这个错误的。我会尽快处理的，嗯嗯。'
+    document.querySelector('#shanbay-popover #shanbay-title').innerHTML = m
     console.error(m, JSON.stringify(res))
   }
 }

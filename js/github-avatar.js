@@ -6,7 +6,8 @@ const actionArr = ['starred', 'created', 'forked', 'watched', 'follow']
 
 const addTends = () => {
   // const tendUrl = 'https://github.com/trending'
-  document.querySelector('header.Header ul[role=navigation]').insertAdjacentHTML('beforeEnd', '<li><a class="js-selected-navigation-item HeaderNavlink px-2" href="/trending">trending</a></li>')
+  const ul = document.querySelector('header.Header ul[role=navigation]')
+    if (ul) ul.insertAdjacentHTML('beforeEnd', '<li><a class="js-selected-navigation-item HeaderNavlink px-2" href="/trending">trending</a></li>')
 }
 /**
  * GitHub 动态首页添加头像
@@ -46,7 +47,7 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
     addTends()
   }
 
-  if (storage.avatar) {
+  if (storage.avatar && (location.href === 'https://github.com' || location.href === 'https://github.com/')) {
     addAvatar()
 
     const observer = new MutationObserver(function (mutations) {

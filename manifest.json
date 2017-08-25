@@ -24,7 +24,7 @@
   "content_scripts": [
     {
       "css": [
-        "css/popup.css"
+        "css/popover.css"
       ],
       "js": [
         "js/const.js",
@@ -44,7 +44,7 @@
         "js/const.js",
         "js/github-avatar.js"
       ],
-      "matches": ["https://github.com/"]
+      "matches": ["https://github.com/*"]
     }
   ],
   "permissions": [
