@@ -34,6 +34,13 @@
     text-decoration: none;
 }
 
+#shabay-popover a:hover {
+    color: #08c;
+    font-weight: normal;
+    text-decoration: underline;
+    background:transparent;
+}
+
 #shanbay-add-word {
     min-height: unset;
 }
