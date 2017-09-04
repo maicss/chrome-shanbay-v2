@@ -52,8 +52,6 @@ ShanbayOauth.prototype.onAuthorize = function (tabId, changeInfo, tab) {
     localStorage.expired_at = new Date((new Date()).getTime() + hash.expires_in * 1000)
     chrome.tabs.get(tabId, function (tab) {
       if (chrome.runtime.lastError) {
-        // 这个没啥意义
-        // debugLogger('error', chrome.runtime.lastError.message)
       } else {
         chrome.tabs.remove(tab.id)
         notify({
@@ -93,7 +91,7 @@ ShanbayOauth.prototype.has_token = function () {
 
 ShanbayOauth.prototype.expired = function () {
   let expired_at = localStorage.expired_at
-  return expired_at === undefined || expired_at < new Date()
+  return expired_at === undefined || new Date(expired_at) < new Date()
 }
 
 ShanbayOauth.prototype.token_valid = function () {
