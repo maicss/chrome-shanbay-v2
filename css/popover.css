@@ -2,7 +2,8 @@
     font-family: "PingFangSC-Light", "Helvetica Neue", Helvetica, "Microsoft YaHei", "微软雅黑", Arial, SimHei, serif;
     box-sizing: content-box;
     -webkit-box-sizing: content-box;
-    color: #000
+    color: #000;
+    -webkit-font-smoothing: unset;
 }
 
 #shanbay-popover .speaker {
