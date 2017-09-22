@@ -47,6 +47,8 @@
 }
 
 #shanbay-popover .shanbay-btn {
+    min-height: auto;
+    min-width: auto;
     display: inline-block;
     padding: 4px 12px;
     margin-bottom: 0;
