@@ -61,8 +61,8 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
         }
       })
     })
-
-    observer.observe(document.querySelector('div.news'), {childList: true})
+    const newsNodes = document.querySelector('div.news')
+    if (newsNodes)observer.observe(newsNodescc, {childList: true})
 
   }
 })
