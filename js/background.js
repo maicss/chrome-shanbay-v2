@@ -98,6 +98,7 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
 
 chrome.contextMenus.removeAll(function () {
   if (storage.contextLookup) {
+    debugLogger('info', 'eontextMenu added')
     const token = oauth.access_token()
     chrome.contextMenus.create({
       title: '在扇贝网中查找 %s',
