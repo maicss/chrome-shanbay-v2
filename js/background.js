@@ -90,24 +90,23 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
     })
   } else {
     storage = storageSettingMap
-  }
+    }
+  // contentMenu
+
+  chrome.contextMenus.removeAll(function () {
+    if (storage.contextLookup) {
+      debugLogger('info', 'contextMenu added')
+      const token = oauth.access_token()
+      chrome.contextMenus.create({
+        title: '在扇贝网中查找 %s',
+        contexts: ['selection'],
+        onclick: function (info, tab) {
+          lookUp(info.selectionText, token).then(res => {
+            chrome.tabs.sendMessage(tab.id, {'action': 'lookup', data: res})
+          })
+        }
+      })
+    }
+  })
   getDailyTask()
-})
-
-// contentMenu
-
-chrome.contextMenus.removeAll(function () {
-  if (storage.contextLookup) {
-    debugLogger('info', 'eontextMenu added')
-    const token = oauth.access_token()
-    chrome.contextMenus.create({
-      title: '在扇贝网中查找 %s',
-      contexts: ['selection'],
-      onclick: function (info, tab) {
-        lookUp(info.selectionText, token).then(res => {
-          chrome.tabs.sendMessage(tab.id, {'action': 'lookup', data: res})
-        })
-      }
-    })
-  }
 })
