@@ -9,7 +9,6 @@ const playSound = url => {
       source.connect(context.destination)
       source.start(0)
     })
-
   })
 }
 /*=================================================================*/
@@ -96,12 +95,11 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
   chrome.contextMenus.removeAll(function () {
     if (storage.contextLookup) {
       debugLogger('info', 'contextMenu added')
-      const token = oauth.access_token()
       chrome.contextMenus.create({
         title: '在扇贝网中查找 %s',
         contexts: ['selection'],
         onclick: function (info, tab) {
-          lookUp(info.selectionText, token).then(res => {
+          lookUp(info.selectionText, oauth.access_token()).then(res => {
             chrome.tabs.sendMessage(tab.id, {'action': 'lookup', data: res})
           })
         }
