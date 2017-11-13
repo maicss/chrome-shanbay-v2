@@ -81,13 +81,6 @@ const getDailyTask = () => {
 
 }
 
-/** add Github tends*/
-const addTends = () => {
-  const ul = document.querySelector('header.Header ul[role=navigation]')
-    if (ul) ul.insertAdjacentHTML('beforeEnd', '<li><a class="js-selected-navigation-item HeaderNavlink px-2" href="/trending">Trending</a></li>')
-}
-
-
 
 chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
   if (Object.keys(settings).length) {
@@ -96,10 +89,6 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
     })
   } else {
     storage = storageSettingMap
-  }
-
-  if (storage.avatar && (location.href === 'https://github.com' || location.href === 'https://github.com/')) {
-    addTends()
   }
 
   // contentMenu

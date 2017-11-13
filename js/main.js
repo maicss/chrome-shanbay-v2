@@ -1,3 +1,10 @@
+/** add Github Trending*/
+const addTends = () => {
+  const ul = document.querySelector('header.Header ul')
+    if (ul) ul.insertAdjacentHTML('beforeEnd', '<li><a class="js-selected-navigation-item HeaderNavlink px-0 py-2" href="/trending">Trending</a></li>')
+}
+
+
 /** 当前选区的父级body
  * @type {DOM(body) | null}
  * */
@@ -19,6 +26,10 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
     })
   } else {
     storage = storageSettingMap
+  }
+
+  if (storage.avatar && (location.href === 'https://github.com' || location.href === 'https://github.com/')) {
+    addTends()
   }
 })
 
@@ -253,16 +264,3 @@ if (document.addEventListener || event.type === 'load' || document.readyState ==
   })
 // })
 }
-// const nodeFilterParentBody = (node) => {
-//   /**
-//    * 获取一个元素的父级body的兼容性更好的方法
-//    * @param node document node
-//    *
-//    * */
-//   let parent = node.parentNode
-//   if (parent.localName === 'body') {
-//     return parent
-//   } else {
-//     return nodeFilterParentBody(parent)
-//   }
-// }
