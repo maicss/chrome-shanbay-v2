@@ -1,5 +1,9 @@
 # chrome-shanbay-v2
 
+## 插件停止使用公告
+2018-10-10
+扇贝在没有通知用户的情况下，关闭了自己API的一些功能，导致用户不能认证，也不能获取用户信息，这样也就不能添加单词，只能用于查单词。这个插件就没有什么意义了。
+
 > shanbay chrome 网页查单词插件
 
 是[jinntrance/shanbay-crx](https://github.com/jinntrance/shanbay-crx)的重构版
