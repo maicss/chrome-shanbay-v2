@@ -2,7 +2,7 @@
 /**
  * @author maicss
  * @file some licences file
- * @copyright 2017 maicss
+ * @copyright 2017-2018 maicss
  * */
 
 /**
@@ -28,11 +28,6 @@ const devMode = !('update_url' in chrome.runtime.getManifest());
 const debugLogger = (level = 'log', ...msg) => {
   if (devMode) console[level](...msg)
 }
-
-// debugLogger 的兼容性写法, 箭头函数里面不能使用arguments
-// const debugLogger = function(level) {
-//   console[level].apply(window, [].slice.call(arguments, 1))
-// }
 
 const notify = (opt = {}) => {
   /**
@@ -78,8 +73,9 @@ const request = (url, options = {}) => {
    * @function request
    * @see [use fetch API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch}
    * @param {string} url - request url
-   * @param {object} options={} - fetch options
+   * @param {object} options - fetch options
    * @param {string} [options.type='buffer'] - whether need return buffer
+   * @param {string} [options.credentials] - whether need cookies
    * @return Promise
   * */
   return fetch(url, options).then(res => {
@@ -96,6 +92,8 @@ const request = (url, options = {}) => {
   }).catch(e => debugLogger('error', `[${new Date().toLocaleDateString()}] fetch failed ${options.method || 'GET'} ${url} ${JSON.stringify(e)}`))
 }
 
+const neededCookieNames = ["csrftoken", "auth_token", "userid"]
+
 const shanbayAPI = {
   /**
    * shanbay API的需要用到的方法，没什么用，只是一个参考
@@ -106,8 +104,9 @@ const shanbayAPI = {
 
   /** 获取用户信息*/
   userInfo: {
+    // 扇贝开放API关闭之后，直接读取扇贝网的cookie，使用扇贝私有API
     method: 'GET',
-    url: 'https://api.shanbay.com/account/?access_token='
+    url: 'https://www.shanbay.com/api/v1/common/user/'
   },
   /** 查询单词*/
   lookUp: {
@@ -169,14 +168,13 @@ storageSettingArray.forEach(item => {
 })
 
 
-const userInfo = (token) => {
+const userInfo = () => {
   /**
    * 获取用户信息
    * @function userInfo
-   * @param {string} token - 用户token
    * @return {object} Promise
    * */
-  return request(shanbayAPI.userInfo.url + token)
+  return request(shanbayAPI.userInfo.url, {credentials: 'include'})
 }
 
 const lookUp = (word, token) => {

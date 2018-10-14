@@ -1,12 +1,8 @@
 const bg = chrome.extension.getBackgroundPage()
 
 function renderUser () {
-  // let bg;
-  // chrome.runtime.getBackgroundPage(function (w) {
-  //   bg = w
-  // })
 
-  function callback (user) {
+  function callback ({data: user}) {
     const header = document.querySelector('#header')
     const batchAddBtn = document.querySelector('#batch-add')
     const learnBtn = document.querySelector('#begin-learning')
@@ -39,13 +35,11 @@ function renderUser () {
     bg.User = user
   }
 
-  if (bg.User) {
-    callback(bg.User)
-    return
-  }
+  debugger
+  if (bg.User) return callback({data: bg.User})
 
   if (bg.oauth.token_valid()) {
-    userInfo(bg.oauth.access_token()).then(userInfo => {
+    userInfo().then(userInfo => {
       callback(userInfo)
     })
   } else {

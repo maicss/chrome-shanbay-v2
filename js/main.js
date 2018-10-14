@@ -1,6 +1,6 @@
 /** add Github Trending*/
 const addTends = () => {
-  const ul = document.querySelector('header.Header ul')
+  const ul = document.querySelector('header.Header ul[role="navigation"]')
     if (ul) ul.insertAdjacentHTML('beforeEnd', '<li><a class="js-selected-navigation-item HeaderNavlink px-0 py-2" href="/trending">Trending</a></li>')
 }
 
@@ -28,7 +28,7 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
     storage = storageSettingMap
   }
 
-  if (storage.avatar && (location.href === 'https://github.com' || location.href === 'https://github.com/')) {
+  if (storage.avatar && location.href.startsWith('https://github.com')) {
     addTends()
   }
 })
@@ -211,7 +211,10 @@ const getSelectionPosition = (range) => {
    * @param {object} range Range的实例
    * @example
    * return {left: 100, top: 100, distance: 10}
-   * @return {object<string:number>} left, top 弹出框的位置; distance, 箭头的偏移量
+   * @return {object}
+   * @return {number} top 弹出框的位置
+   * @return {number} left 弹出框的位置
+   * @return {number} distance 箭头的偏移量
    * */
   /** 选区的范围数据*/
   let {left, top, height, width} = range.getBoundingClientRect()
@@ -251,7 +254,7 @@ const hidePopover = (delay) => {
 
 if (document.addEventListener || event.type === 'load' || document.readyState === 'complete') {
 // document.addEventListener('DOMContentLoaded', function () {
-  console.log('Shanbay Extension DOMContentLoaded......')
+  // console.log('Shanbay Extension DOMContentLoaded......')
   document.addEventListener('dblclick', pendingSearchSelection)
   document.addEventListener('click', function (e) {
     /** 屏蔽弹出框的双击事件*/

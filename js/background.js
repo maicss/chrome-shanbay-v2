@@ -1,7 +1,32 @@
 window.oauth = ShanbayOauth.initPage()
+window.__shanbayExtensionAuthInfo = {
+  getAuthCookies: false,
+  isValid () {
+    return this.expiration_date && this.expiration_date > new Date() * 1
+  }
+}
+
+chrome.cookies.getAll({url: 'https://www.shanbay.com'}, cookiesArray => {
+  for (let cookie of cookiesArray) {
+    if (neededCookieNames.includes(cookie.name) && cookie.value.trim()) {
+      window.__shanbayExtensionAuthInfo.getAuthCookies = true
+      if (cookie.name === 'auth_token') {
+        window.__shanbayExtensionAuthInfo.expiration_date = cookie.expirationDate
+      }
+      window.__shanbayExtensionAuthInfo[cookie.name] = cookie.value
+    }
+  }
+  if (!window.__shanbayExtensionAuthInfo) {
+    notify({
+      message: '没有获取到扇贝网的登录信息，点击通知登录。',
+      url: 'https://web.shanbay.com/web/account/login/'
+    })
+  }
+})
+
 /*=====================使用web音频接口播放音频的方法==================*/
-const context = new AudioContext()
 const playSound = url => {
+  const context = new AudioContext()
   request(url, {type: 'buffer'}).then(r => {
     context.decodeAudioData(r, function (buffer) {
       const source = context.createBufferSource()
@@ -40,12 +65,8 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
     case 'playSound':
       playSound(req.url)
       break
-    // case 'getBG':
-    //   console.log(window)
-    //   (function callbackWindow (a) {
-    //     a(window)
-    //   })(sendResponse)
-    //   break
+    default:
+      throw Error('Invalid action type')
   }
 })
 
