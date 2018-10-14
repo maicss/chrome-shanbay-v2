@@ -61,10 +61,10 @@ const getOptions = () => {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
-    debugLogger('log', 'chromeShanbaySettings: ', settings)
+  chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
+    debugLogger('log', '__shanbayExtensionSettings: ', settings)
     if (Object.keys(settings).length) {
-      renderOptions(settings.chromeShanbaySettings)
+      renderOptions(settings.__shanbayExtensionSettings)
     } else {
       renderOptions(storageSettingArray)
     }
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.querySelector('#save').onclick = function () {
     let _settings = getOptions()
-    chrome.storage.sync.set({chromeShanbaySettings: _settings}, () => {
+    chrome.storage.sync.set({__shanbayExtensionSettings: _settings}, () => {
       console.log('lastError in options js: ', chrome.runtime.lastError)
       if (!chrome.runtime.lastError) {
         const saveRes = document.querySelector('#saveRes');
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
           saveRes.className = 'hide'
         }, 1000)
       }
-      debugLogger('log', 'chromeShanbaySettings settled.')
+      debugLogger('log', '__shanbayExtensionSettings settled.')
     })
   }
 })

@@ -1,6 +1,6 @@
 {
   "name": "扇贝助手v2",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "author": "maicss, jinntrance",
   "manifest_version": 2,
   "description": "基于shanbay API的网页查询并加入单词到生词本的应用。并添加了GitHub首页头像和trend功能",
@@ -10,7 +10,6 @@
   "background": {
     "scripts": [
       "js/const.js",
-      "js/shanbay_oauth2.js",
       "js/background.js"
     ]
   },

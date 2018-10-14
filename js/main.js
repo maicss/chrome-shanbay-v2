@@ -18,10 +18,10 @@ let offset = null
 /**
  * 从chrome的storage里获取存储的插件的设置，如果有值，就给storage赋值，否者就使用默认的storageSettingMap
  * */
-chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
+chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
   debugLogger('info', 'chrome storage loaded')
   if (Object.keys(settings).length) {
-    settings.chromeShanbaySettings.forEach(item => {
+    settings.__shanbayExtensionSettings.forEach(item => {
       Object.assign(storage, item)
     })
   } else {
@@ -39,7 +39,7 @@ chrome.storage.sync.get('chromeShanbaySettings', (settings) => {
 chrome.storage.onChanged.addListener(function (changes) {
   debugLogger('info', 'chrome storage changed')
   storage = {}
-  changes.chromeShanbaySettings.newValue.forEach(item => {
+  changes.__shanbayExtensionSettings.newValue.forEach(item => {
     Object.assign(storage, item)
   })
 })

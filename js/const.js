@@ -73,11 +73,11 @@ const request = (url, options = {}) => {
    * @function request
    * @see [use fetch API]{@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch}
    * @param {string} url - request url
-   * @param {object} options - fetch options
+   * @param {object} [options] - fetch options
    * @param {string} [options.type='buffer'] - whether need return buffer
-   * @param {string} [options.credentials] - whether need cookies
    * @return Promise
   * */
+  options = Object.assign(options, {credentials: 'include'})
   return fetch(url, options).then(res => {
     if (res.ok) {
       if (options.type === 'buffer') return res.arrayBuffer()
@@ -92,11 +92,10 @@ const request = (url, options = {}) => {
   }).catch(e => debugLogger('error', `[${new Date().toLocaleDateString()}] fetch failed ${options.method || 'GET'} ${url} ${JSON.stringify(e)}`))
 }
 
-const neededCookieNames = ["csrftoken", "auth_token", "userid"]
-
 const shanbayAPI = {
   /**
    * shanbay API的需要用到的方法，没什么用，只是一个参考
+   * 扇贝开放API关闭之后，直接读取扇贝网的cookie，使用扇贝私有API
    * @constant
    * @readonly
    * @enum {object}
@@ -104,27 +103,26 @@ const shanbayAPI = {
 
   /** 获取用户信息*/
   userInfo: {
-    // 扇贝开放API关闭之后，直接读取扇贝网的cookie，使用扇贝私有API
     method: 'GET',
     url: 'https://www.shanbay.com/api/v1/common/user/'
   },
   /** 查询单词*/
   lookUp: {
     method: 'GET',
-    url: 'https://api.shanbay.com/bdc/search/?word={word}&access_token=',
+    url: 'https://www.shanbay.com/api/v1/bdc/search/?word={word}&version_id=2',
     params: ['word']
   },
   /** 添加一个单词到单词本*/
   add: {
     method: 'POST',
-    url: 'https://api.shanbay.com/bdc/learning/?access_token=',
+    url: 'https://www.shanbay.com/api/v1/bdc/learning/',
     params: ['id']
   },
   /** 重置一个单词的熟练度*/
   forget: {
     method: 'PUT',
-    url: ' https://api.shanbay.com/bdc/learning/{learning_id}/?access_token=',
-    params: [{forget: 1}]
+    url: ' https://www.shanbay.com/api/v1/bdc/learning/{learning_id}',
+    params: [{retention: 1}]
   }
 }
 
@@ -174,28 +172,26 @@ const userInfo = () => {
    * @function userInfo
    * @return {object} Promise
    * */
-  return request(shanbayAPI.userInfo.url, {credentials: 'include'})
+  return request(shanbayAPI.userInfo.url)
 }
 
-const lookUp = (word, token) => {
+const lookUp = word => {
   /**
    * 查询单词
    * @function lookUp
    * @param {string} word - 需要查询的单词
-   * @param {string} token - 用户token
    * @return {object} Promise
    * */
-  return request((shanbayAPI.lookUp.url + token).replace('{word}', word))
+  return request((shanbayAPI.lookUp.url).replace('{word}', word))
 }
-const addWord = (id, token) => {
+const addWord = id => {
   /**
    * 添加单词
    * @function addWord
    * @param {number} id - 单词ID
-   * @param {string} token - 用户token
    * @return {object} Promise
    * */
-  return request(shanbayAPI.add.url + token, {
+  return request(shanbayAPI.add.url, {
     method: shanbayAPI.add.method,
     headers: {
       'Content-Type': 'application/json'
@@ -203,15 +199,14 @@ const addWord = (id, token) => {
     body: JSON.stringify({id})
   })
 }
-const forget = (learningId, token) => {
+const forget = learningId => {
   /**
    * 忘记单词
    * @function forget
    * @param {number} learningId - 单词的learningId
-   * @param {string} token - 用户token
    * @return {object} Promise
    * */
-  return request((shanbayAPI.forget.url + token).replace('{learning_id}', learningId), {
+  return request((shanbayAPI.forget.url).replace('{learning_id}', learningId), {
     method: shanbayAPI.forget.method,
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({forget: 1})
