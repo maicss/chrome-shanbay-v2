@@ -28,7 +28,7 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
     storage = storageSettingMap
   }
 
-  if (storage.avatar && location.href.startsWith('https://github.com')) {
+  if (storage.trend && location.href.startsWith('https://github.com')) {
     addTends()
   }
 })

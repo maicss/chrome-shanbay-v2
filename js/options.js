@@ -61,10 +61,10 @@ const getOptions = () => {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
+  chrome.storage.sync.get('__shanbayExtensionSettings', ({__shanbayExtensionSettings: settings}) => {
     debugLogger('log', '__shanbayExtensionSettings: ', settings)
-    if (Object.keys(settings).length) {
-      renderOptions(settings.__shanbayExtensionSettings)
+    if (settings && Object.keys(settings).length) {
+      renderOptions(settings)
     } else {
       renderOptions(storageSettingArray)
     }
