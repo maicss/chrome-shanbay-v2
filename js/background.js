@@ -52,10 +52,9 @@ const getDailyTask = () => {
    * @function getDailyTask
    * */
   let taskTimer
-  taskTimer = setInterval(function () {
-    if (!storage.alarm && taskTimer) {
-      clearInterval(taskTimer)
-    } else {
+  if (storage.alarm) {
+    taskTimer = setInterval(function () {
+      if (!storage.alarm) return clearInterval(taskTimer)
       debugLogger('log', 'send daily task request')
       request('https://www.shanbay.com/api/v1/bdc/stats/today/').then(r => {
 
@@ -68,12 +67,22 @@ const getDailyTask = () => {
             url: 'https://www.shanbay.com/bdc/review/'
           })
         }
-
       }).catch(e => debugLogger('error', 'get daily task failed, cause: ', e))
-    }
-  }, 1000 * 60 * 60 * 3)
-
+    }, 1000 * 60 * 60 * 3)
+  } else {
+    if (taskTimer) clearInterval(taskTimer)
+  }
 }
+
+chrome.storage.onChanged.addListener(changes => {
+  const settings = changes.__shanbayExtensionSettings.newValue
+  if (Object.keys(settings).length) {
+    settings.forEach(item => {
+      Object.assign(storage, item)
+    })
+  }
+  getDailyTask()
+})
 
 chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
   if (Object.keys(settings).length) {

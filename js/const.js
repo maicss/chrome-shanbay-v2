@@ -15,7 +15,7 @@ let storage = {}
  * @type {boolean}
  * */
 
-const devMode = !('update_url' in chrome.runtime.getManifest());
+const devMode = !('update_url' in chrome.runtime.getManifest())
 
 /**
  * 开发模式的log打印
@@ -160,7 +160,7 @@ const storageSettingArray = extensionSpecification.map(setting => {
  * 由storageSettingArray数组生成的map
  * @type {Object}
  * */
-let storageSettingMap = {};
+let storageSettingMap = {}
 storageSettingArray.forEach(item => {
   Object.assign(storageSettingMap, item)
 })

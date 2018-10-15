@@ -32,8 +32,8 @@ const getOptions = () => {
    * @return setting 配置信息的数组
    * */
   const inputs = document.querySelectorAll('input')
-  const settings = [];
-  [].forEach.call(inputs, input => {
+  const settings = []
+  ;[].forEach.call(inputs, input => {
     if (input.type === 'checkbox') {
       settings.push({
         [input.name]: input.checked
@@ -51,8 +51,8 @@ const getOptions = () => {
       })
     }
   })
-  const selects = document.querySelectorAll('select');
-  [].forEach.call(selects, select => {
+  const selects = document.querySelectorAll('select')
+  ;[].forEach.call(selects, select => {
     settings.push({
       [select.name]: select.value
     })
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.storage.sync.set({__shanbayExtensionSettings: _settings}, () => {
       console.log('lastError in options js: ', chrome.runtime.lastError)
       if (!chrome.runtime.lastError) {
-        const saveRes = document.querySelector('#saveRes');
+        const saveRes = document.querySelector('#saveRes')
         saveRes.className = ''
         setTimeout(function () {
           saveRes.className = 'hide'

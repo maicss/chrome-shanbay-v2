@@ -133,11 +133,11 @@ const popover = (res) => {
 </div>
   `
 
-    document.querySelector('#shanbay-popover #shanbay-inner').innerHTML = contentHtml;
+    document.querySelector('#shanbay-popover #shanbay-inner').innerHTML = contentHtml
 
     /** 各种事件的处理*/
     /** 发音事件的处理 */
-    [].forEach.call(document.querySelectorAll('#shanbay-popover .speaker'), (speaker) => {
+    ;[].forEach.call(document.querySelectorAll('#shanbay-popover .speaker'), (speaker) => {
       speaker.addEventListener('click', function () {
         chrome.runtime.sendMessage({action: 'playSound', url: this.dataset.target})
       })
