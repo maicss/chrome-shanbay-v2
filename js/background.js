@@ -46,12 +46,13 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
   }
 })
 
+let taskTimer
+
 const getDailyTask = () => {
   /**
    * 每3小时检测一下今天的剩余单词数量, 必须登录扇贝之后才可以使用
    * @function getDailyTask
    * */
-  let taskTimer
   if (storage.alarm) {
     taskTimer = setInterval(function () {
       if (!storage.alarm) return clearInterval(taskTimer)
