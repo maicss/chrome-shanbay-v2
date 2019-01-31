@@ -23,17 +23,17 @@
             padding: 0;
             border-radius: 4px;
             border: none;
-            width: 80px;
+            width: 90px;
             height:26px;
             color: #fff;
             user-select: none;
             outline: none;
             cursor: pointer;
         }
-        #header {
-            cursor: pointer;
-            text-align: center;
-        }
+        /*#header {*/
+            /*cursor: pointer;*/
+            /*text-align: center;*/
+        /*}*/
         #header img {
             width: 40px;
             height:40px;
@@ -45,18 +45,21 @@
         }
         a {
             outline: none;
+            text-decoration: none;
+            color: white;
         }
 
     </style>
 </head>
 <body>
 <div>
-    <div id="header" class="hide"><a href=""><img src="images/default_head.png"></a></div>
+    <!--<div id="header" class="hide"><a href=""><img src="images/default_head.png"></a></div>-->
     <ul>
         <li><button id="batch-add" class="hide">批量添加单词</button></li>
         <li><button id="begin-learning" class="hide">开始背单词</button></li>
         <li><button id="options" class="hide">高级设置</button></li>
         <li><button id="logout" class="hide">退出</button></li>
+        <li><button id="login" class="hide"><a href="">登录</a></button></li>
     </ul>
 </div>
 </body>

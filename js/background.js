@@ -1,8 +1,10 @@
 window.__shanbayExtensionAuthInfo = {
   user: null,
-  checkAuth (cb) {
-    chrome.cookies.get({url: 'https://www.shanbay.com', name: 'auth_token'}, cookie => {
-      cb(!cookie || cookie.expirationDate || cookie.expirationDate < new Date() * 1)
+  checkAuth (callback) {
+    chrome.cookies.getAll({url: 'https://www.shanbay.com'}, cookies => {
+      this.user = (cookies.find(cookie => cookie.name === 'userid') || {}).value
+      const auth_token = (cookies.find(cookie => cookie.name === 'auth_token') || {}).value
+      callback(auth_token && auth_token.length > 0)
     })
   }
 }

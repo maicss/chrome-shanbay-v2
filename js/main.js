@@ -1,8 +1,8 @@
 /** add Github Trending*/
-const addTends = () => {
-  const ul = document.querySelector('header.Header ul[role="navigation"]')
-    if (ul) ul.insertAdjacentHTML('beforeEnd', '<li><a class="js-selected-navigation-item HeaderNavlink px-0 py-2" href="/trending">Trending</a></li>')
-}
+// const addTends = () => {
+//   const ul = document.querySelector('header.Header ul[role="navigation"]')
+//     if (ul) ul.insertAdjacentHTML('beforeEnd', '<li><a class="js-selected-navigation-item HeaderNavlink px-0 py-2" href="/trending">Trending</a></li>')
+// }
 
 
 /** 当前选区的父级body
@@ -28,9 +28,9 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
     storage = storageSettingMap
   }
 
-  if (storage.trend && location.href.startsWith('https://github.com')) {
-    addTends()
-  }
+  // if (storage.trend && location.href.startsWith('https://github.com')) {
+  //   addTends()
+  // }
 })
 
 /**
