@@ -76,12 +76,12 @@ const request = (url, options = {}) => {
       if (res.ok) {
         if (options.type === 'buffer') return res.arrayBuffer()
         return res.json()
-      } else {
-        if (res.status === 401) {
-          notify({ title: '扇贝网登录信息已过期', message: '请点击本通知或去扇贝网重新登录，否者将不能使用添加单词、右键查词和背单词提醒等功能。' })
-        }
+      } else if (res.status === 401) {
+        notify({ title: '扇贝网登录信息已过期', message: '请点击本通知或去扇贝网重新登录，否者将不能使用添加单词、右键查词和背单词提醒等功能。' })
         debugLogger('error', `[${new Date().toLocaleDateString()}] request failed ${options.method || 'GET'} ${url} ${JSON.stringify(res)}`)
-        return Promise.reject(res)
+        return Promise.reject({status: 401})
+      } else {
+        return Promise.reject(res.json())
       }
     })
     // .catch(e => debugLogger('error', `[${new Date().toLocaleDateString()}] fetch failed ${options.method || 'GET'} ${url} ${JSON.stringify(e)}`))
@@ -93,11 +93,13 @@ const request = (url, options = {}) => {
           url: 'https://web.shanbay.com/web/account/login/'
         })
       } else {
-        notify({
+        e.then(error => {
+          console.error(error)
+          notify({
           title: 'oops, 意外发生了',
-          message: '点击消息报告问题',
+          message: JSON.stringify(error),
           url: 'https://github.com/maicss/chrome-shanbay-v2/issues'
-        })
+        })})
       }
     })
 }
