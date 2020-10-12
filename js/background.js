@@ -28,9 +28,8 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
   switch (req.action) {
     case 'lookup':
       lookUp(req.word)
-        .then(res => checkWordAdded(res.id).then(existsRes => {res.exists = existsRes.objects[0].exists; return res}).catch(e => {console.error('查询单词是否存在于单词本失败', e); res.exists = 'error'; return res}))
+        .then(res => checkWordAdded(res.id).then(existsRes => {res.exists = existsRes.objects[0].exists; return res}))
         .then(data => chrome.tabs.sendMessage(sender.tab.id, {'action': 'lookup', data}))
-        .catch(data => chrome.tabs.sendMessage(sender.tab.id, {'action': 'lookup', data}))
       break
     case 'addOrForget':
       addOrForget(req.word, req.wordID).then(res => {
@@ -40,7 +39,6 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
     case 'getWordExample':
       getWordExampleSentence(req.id)
         .then(data => chrome.tabs.sendMessage(sender.tab.id, {'action': 'getWordExample', data}))
-        .catch(data => chrome.tabs.sendMessage(sender.tab.id, {'action': 'getWordExample', data}))
       break
     case 'playSound':
       playSound(req.url)
@@ -103,13 +101,14 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
     if (storage.contextLookup) {
       debugLogger('info', 'contextMenu added')
       chrome.contextMenus.create({
+        id: Math.random().toString(36),
         title: '在扇贝网中查找 %s',
         contexts: ['selection'],
-        onclick: function (info, tab) {
-          lookUp(info.selectionText).then(res => {
-            chrome.tabs.sendMessage(tab.id, {'action': 'lookup', data: res})
-          })
-        }
+      })
+      chrome.contextMenus.onClicked.addListener((info, tab) => {
+        lookUp(info.selectionText).then(res => {
+          chrome.tabs.sendMessage(tab.id, {'action': 'lookup', data: res})
+        })
       })
     }
   })

@@ -1,7 +1,7 @@
 /**
  * @author maicss
  * @file some licences file
- * @copyright 2017-2019 maicss
+ * @copyright 2017-2020 maicss
  * */
 
 /**
@@ -41,7 +41,7 @@ const notify = (opt = {title: '人丑多读书', message: '少壮不努力，老
     type: 'basic',
     title: opt.title,
     message: opt.message,
-    iconUrl: '../images/icon_48.png'
+    iconUrl: '../images/icon_48.png',
   }
   let noteID = Math.random().toString(36)
   chrome.notifications.create(noteID, options, (notifyID) => {
@@ -77,7 +77,7 @@ const request = (url, options = {}) => {
         if (options.type === 'buffer') return res.arrayBuffer()
         return res.json()
       } else if (res.status === 401) {
-        notify({ title: '扇贝网登录信息已过期', message: '请点击本通知或去扇贝网重新登录，否者将不能使用添加单词、右键查词和背单词提醒等功能。' })
+        notify({ title: '扇贝网登录信息已过期', message: '请点击本通知或去扇贝网重新登录，否者将不能使用添加单词、右键查词和背单词提醒等功能。', url: 'https://web.shanbay.com/web/account/login/' })
         debugLogger('error', `[${new Date().toLocaleDateString()}] request failed ${options.method || 'GET'} ${url} ${JSON.stringify(res)}`)
         return Promise.reject({status: 401})
       } else {
@@ -93,15 +93,7 @@ const request = (url, options = {}) => {
           url: 'https://web.shanbay.com/web/account/login/'
         })
       } else {
-        return e.then(error => {
-          console.error(error)
-          // notify({
-          //   title: 'oops, 意外发生了',
-          //   message: JSON.stringify(error),
-          //   url: 'https://github.com/maicss/chrome-shanbay-v2/issues'
-          // })
-          return Promise.reject(error)
-        })
+        return e.then ? e.then(error => Promise.reject(error)) : Promise.reject(e)
       }
     })
 }

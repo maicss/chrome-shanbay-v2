@@ -122,7 +122,7 @@ const popover = (res) => {
     let contentHtml = `
 <div id="shanbay-title">
     <span class="word">${data.content}</span>
-    <!-- <a href="https://www.shanbay.com/bdc/vocabulary/${data.id}" style="float: right;" target="_blank"> 详细</a> -->
+    <a href="https://web.shanbay.com/wordsweb/#/detail/${data.id}" style="float: right;" target="_blank"> 查看详情 </a>
     <div>${assemblyPronunciationStr()}</div>
 </div>
 <div id="shanbay-content">
@@ -198,11 +198,11 @@ chrome.runtime.onMessage.addListener(function (res, sender) {
       exampleSentenceDiv.innerHTML = res.data.map((item, index) => `<p>${index + 1}, ${item.content_en} <span class="speaker" data-target="${item.audio.us.urls[0]}"></span></p><p>  ${item.content_cn}</p>`).join('')
       exampleSentenceDiv.className = 'simple-definition'
       exampleSentenceSpan.innerHTML = ''
-      Array.from(exampleSentenceDiv.querySelectorAll('.speaker').forEach(dom => {
+      Array.from(exampleSentenceDiv.querySelectorAll('.speaker')).forEach(dom => {
         dom.addEventListener('click', function () {
           chrome.runtime.sendMessage({action: 'playSound', url: this.dataset.target})
         })
-      }))
+      })
       break
   }
 })
