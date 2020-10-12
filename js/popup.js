@@ -4,7 +4,7 @@ function renderUser () {
   const login = document.querySelector('#login')
 
   bg.__shanbayExtensionAuthInfo.checkAuth(function (auth) {
-    if (auth) {
+    if (auth.length) {
       const batchAddBtn = document.querySelector('#batch-add')
       const learnBtn = document.querySelector('#begin-learning')
       const settingBtn = document.querySelector('#options')
@@ -30,10 +30,10 @@ function renderUser () {
 document.addEventListener('DOMContentLoaded', function () {
   renderUser()
   document.querySelector('#batch-add').onclick = function () {
-    chrome.tabs.create({ url: 'https://www.shanbay.com/bdc/vocabulary/add/batch/' })
+    chrome.tabs.create({ url: 'https://web.shanbay.com/wordsweb/#/collection' })
   }
   document.querySelector('#begin-learning').onclick = function () {
-    chrome.tabs.create({ url: 'https://www.shanbay.com/bdc/review/' })
+    chrome.tabs.create({ url: 'https://web.shanbay.com/wordsweb/#/collection' })
   }
   document.querySelector('#options').onclick = function () {
     chrome.tabs.create({ url: 'options.html' })

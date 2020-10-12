@@ -81,7 +81,7 @@ const request = (url, options = {}) => {
         debugLogger('error', `[${new Date().toLocaleDateString()}] request failed ${options.method || 'GET'} ${url} ${JSON.stringify(res)}`)
         return Promise.reject({status: 401})
       } else {
-        return Promise.reject(res.json())
+        return Promise.reject(res.json ? res.json() : res.text())
       }
     })
     // .catch(e => debugLogger('error', `[${new Date().toLocaleDateString()}] fetch failed ${options.method || 'GET'} ${url} ${JSON.stringify(e)}`))
@@ -93,13 +93,15 @@ const request = (url, options = {}) => {
           url: 'https://web.shanbay.com/web/account/login/'
         })
       } else {
-        e.then(error => {
+        return e.then(error => {
           console.error(error)
-          notify({
-          title: 'oops, 意外发生了',
-          message: JSON.stringify(error),
-          url: 'https://github.com/maicss/chrome-shanbay-v2/issues'
-        })})
+          // notify({
+          //   title: 'oops, 意外发生了',
+          //   message: JSON.stringify(error),
+          //   url: 'https://github.com/maicss/chrome-shanbay-v2/issues'
+          // })
+          return Promise.reject(error)
+        })
       }
     })
 }
@@ -120,20 +122,24 @@ const shanbayAPI = {
   /** 查询单词*/
   lookUp: {
     method: 'GET',
-    url: 'https://www.shanbay.com/api/v1/bdc/search/?word={word}&version_id=2',
+    url: 'https://apiv3.shanbay.com/abc/words/senses?vocabulary_content={word}',
     params: ['word']
   },
-  /** 添加一个单词到单词本*/
-  add: {
-    method: 'POST',
-    url: 'https://www.shanbay.com/api/v1/bdc/learning/',
+  wordCheck: {
+    method: 'GET',
+    url: 'https://apiv3.shanbay.com/wordscollection/words_check?vocab_ids={id}',
     params: ['id']
   },
-  /** 重置一个单词的熟练度*/
-  forget: {
-    method: 'PUT',
-    url: ' https://www.shanbay.com/api/v1/bdc/learning/{learning_id}',
-    params: [{ retention: 1 }]
+  wordExample: {
+    method: 'GET',
+    url: 'https://apiv3.shanbay.com/abc/words/vocabularies/{id}/examples',
+    params: ['id']
+  },
+  /** 添加生词和标记已添加生词已忘记 */
+  addOrForget: {
+    method: 'POST',
+    url: 'https://apiv3.shanbay.com/news/words',
+    params: [{"vocab_id":"","business_id":2,"paragraph_id":"1","sentence_id":"A1","source_content":"","article_id":"ca","source_name":"","summary":""}]
   }
 }
 
@@ -152,6 +158,7 @@ const extensionSpecification = [
   { 'reminderContent': '少壮不努力，老大背单词', desc: '提示框内容', },
   { 'autoRead': 'false', desc: '自动发音', enum: ['EN', 'US', 'false'] },
   { 'paraphrase': 'bilingual', desc: '默认释义', enum: ['Chinese', 'English', 'bilingual'] },
+  { 'exampleSentence': true, desc: '显示例句按钮', enum: [true, false] },
   // {'trend': true, desc: '添加Github trend导航', enum: [true, false]},
 ]
 /**
@@ -176,34 +183,25 @@ storageSettingArray.forEach(item => {
 })
 
 /**
- * 查询单词
+ * @description 查询单词
  * @function lookUp
  * @param {string} word - 需要查询的单词
- * @return {object} Promise
+ * @return Promise<object>
  * */
-const lookUp = word => {
-  return request((shanbayAPI.lookUp.url).replace('{word}', word))
-}
-const addWord = id => {
-  return request(shanbayAPI.add.url, {
-    method: shanbayAPI.add.method,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ id })
-  })
-}
+const lookUp = word => request((shanbayAPI.lookUp.url).replace('{word}', word), {method: shanbayAPI.wordExample.method})
 
-/**
- * 忘记单词
- * @function forget
- * @param {number} learningId - 单词的learningId
- * @return {object} Promise
- * */
-const forget = learningId => {
-  return request((shanbayAPI.forget.url).replace('{learning_id}', learningId), {
-    method: shanbayAPI.forget.method,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ forget: 1 })
-  })
-}
+const checkWordAdded = wordID => request(shanbayAPI.wordCheck.url.replace('{id}', wordID), {method: shanbayAPI.wordExample.method})
+
+const getWordExampleSentence = wordID => request(shanbayAPI.wordExample.url.replace('{id}', wordID), {method: shanbayAPI.wordExample.method})
+
+/** 
+ * @description 添加单词到单词本或忘记单词
+ * @param {string} word - 单词
+ * @param {string} wordID - 单词id
+ * @return Promise<object>
+ */
+const addOrForget = (word, wordID) => request(shanbayAPI.addOrForget.url, {
+  method: shanbayAPI.addOrForget.method,
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({"vocab_id": wordID,"business_id":2,"paragraph_id":"1","sentence_id":"A1","source_content":"","article_id":"ca","source_name":"","summary": word})
+})

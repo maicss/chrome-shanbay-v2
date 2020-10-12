@@ -43,18 +43,16 @@ chrome.storage.onChanged.addListener(function (changes) {
     Object.assign(storage, item)
   })
 })
-
-const pendingSearchSelection = (e) => {
   /**
    * 双击事件和右键选中后的事件处理器。
    * @function pendingSearchSelection
    * @param {object}[e] - 双击事件的对象
    * 兼容性: node.getRootNode: chrome 54+
    * */
-  const _popover = document.querySelector('#shanbay-popover')
-  if (_popover) {
-    return
-  }
+const pendingSearchSelection = (e) => {
+
+  const _popover = document.querySelector('#__shanbay-popover')
+  if (_popover) return
   let _selection = getSelection()
   if (!_selection.rangeCount) return
   let _range = getSelection().getRangeAt(0)
@@ -79,7 +77,6 @@ const pendingSearchSelection = (e) => {
 
 }
 
-const popover = (res) => {
   /**
    * 根据参数和设置渲染弹出框，并处理弹出框上的各种事件
    * @function popover
@@ -87,135 +84,136 @@ const popover = (res) => {
    * @param {boolean} [res.loading] - 查询前的准备状态和未登录的提示
    * @param {object} [res.data] - 查询结果
    * */
+const popover = (res) => {
   /** 如果全局的父级body不存在，使用pendingSearchSelection查找父级body，是右键查询，非事件触发使用的*/
   if (!selectionParentBody) {
     pendingSearchSelection()
   }
 
   /** 先根据选区确定弹出框的位置，生成弹出框，然后根据参数和设置，往里面插入内容*/
-  let html = `<div id="shanbay-popover" style="top: ${offset.top}px; left: ${offset.left}px; display: block"><div id="shanbay-arrow" style= ${offset.distance ? 'left:' + offset.distance + 'px' : ''}></div><div id="shanbay-inner"><div id="shanbay-title" style="border: none;"></div></div></div>`
+  let html = `<div id="__shanbay-popover" style="top: ${offset.top}px; left: ${offset.left}px; display: block"><div id="shanbay-arrow" style= ${offset.distance ? 'left:' + offset.distance + 'px' : ''}></div><div id="shanbay-inner"><div id="shanbay-title" style="border: none;"></div></div></div>`
 
   /** 这里是为了防止多次调用popover产生多个弹出框的。因为一次查询最起码会调用两次popover*/
-  if (!document.querySelector('#shanbay-popover')) {
+  if (!document.querySelector('#__shanbay-popover')) {
     selectionParentBody.insertAdjacentHTML('beforeEnd', html)
   }
 
   if (res.loading) {
     /** 查询之前和未登录的提示信息*/
-    document.querySelector('#shanbay-popover #shanbay-title').innerHTML = res.msg
-  } else if (res.status_code === 0) {
+    document.querySelector('#__shanbay-popover #shanbay-title').innerHTML = res.msg
+  } else if (res.data.errors) {
+    document.querySelector('#__shanbay-popover #shanbay-inner').innerHTML = `<div id="shanbay-title" style="border: none;">${res.data.msg}</div>`
+  } else {
     /** 查询单词或者单词其他操作成功*/
     let data = res.data
+    const assemblyPronunciationStr = () => {
+      if (!data.audios.length) return ''
+      let str = ''
+      if (data.audios[0].uk ) {
+        str += `<span>uk: </span><small>/${data.audios[0].uk.ipa}/</small> `
+        if (data.audios[0].uk.urls.length) str += `<span class="speaker" data-target="${data.audios[0].uk.urls[0]}"></span> `
+      }
+      if (data.audios[0].us ) {
+        str += `<span>us: </span><small>/${data.audios[0].us.ipa}/</small> `
+        if (data.audios[0].us.urls.length) str += `<span class="speaker" data-target="${data.audios[0].us.urls[0]}"></span> `
+      }
+      return str
+    }
     let contentHtml = `
 <div id="shanbay-title">
     <span class="word">${data.content}</span>
-    <a href="https://www.shanbay.com/bdc/vocabulary/${data.id}" style="float: right;" target="_blank"> 详细</a>
-    <div>
-        
-        ${data.pronunciations.uk ? `<span>uk: </span><small>/${data.pronunciations.uk}/</small>
-        <span class="speaker" data-target="${data.uk_audio}"></span>` : ''}
-        
-        ${data.pronunciations.us ? `<span>us: </span><small>/${data.pronunciations.us}/</small>
-        <span class="speaker" data-target="${data.us_audio}"></span>` : ''}
-        
-    </div>
+    <!-- <a href="https://www.shanbay.com/bdc/vocabulary/${data.id}" style="float: right;" target="_blank"> 详细</a> -->
+    <div>${assemblyPronunciationStr()}</div>
 </div>
 <div id="shanbay-content">
     <div class="simple-definition">
-        ${storage.paraphrase !== 'English' ? (data.cn_definition.pos ? `<div><strong>${data.cn_definition.pos} </strong><span>${data.cn_definition.defn}</span></div>` : data.cn_definition.defn ? data.cn_definition.defn.split('\n').join('<br>') : '' ) : ''}
-        ${ storage.paraphrase !== 'Chinese' ? Object.keys(data.en_definitions).map(pos => `<div><span>${pos}. </span><span>${data.en_definitions[pos].join(';')}</span></div>`).join('') : ''}
+        ${storage.paraphrase !== 'English' ? (data.definitions.cn.length ? `<div><strong>中文：</strong> ${data.definitions.cn.map(p => `<div><span>${p.pos} </span><span>${p.def}</span></div>`).join('')}</div>`: '') : ''}
+        ${ storage.paraphrase !== 'Chinese' ? (data.definitions.en.length ? `<div><strong>英文：</strong>${data.definitions.en.map(p => `<div><span>${p.pos} </span><span>${p.def}</span></div>`).join('')}</div>`: '') : ''}
     </div>
-    <div class="add">
-        ${data.learning_id ? `<p id="shanbay-forget-word"><button class="forget shanbay-btn">我忘了</button></p>` : `<p><button id="shanbay-add-word" class="shanbay-btn">添加</button></p>`}
-        <p class="hide" id="shanbay-under-adding"><span class="loading">正在添加</span></p>
+    <div id="shanbay-example-sentence-div" class="hide"></div>
+    <div id="footer">
+      <span id="shanbay-example-sentence-span"><button id="shanbay-example-sentence-btn" class="shanbay-btn">查看例句</button></span>
+      ${data.exists === 'error' ? '' : `<span id="shanbay-add-word-span"><button id="shanbay-add-word-btn" class="shanbay-btn ${data.exists ? 'forget' : ''}">${data.exists ? '我忘了' : '添加'}</button></span>`}
     </div>
-    <div id="shanbay-add-result" class="hide"></div>
 </div>
   `
 
-    document.querySelector('#shanbay-popover #shanbay-inner').innerHTML = contentHtml
-
+    document.querySelector('#__shanbay-popover #shanbay-inner').innerHTML = contentHtml
     /** 各种事件的处理*/
     /** 发音事件的处理 */
-    ;[].forEach.call(document.querySelectorAll('#shanbay-popover .speaker'), (speaker) => {
+    Array.from(document.querySelectorAll('#__shanbay-popover .speaker')).forEach((speaker) => {
       speaker.addEventListener('click', function () {
         chrome.runtime.sendMessage({action: 'playSound', url: this.dataset.target})
       })
     })
+    const exampleSentenceBtn = document.querySelector('#shanbay-example-sentence-btn')
+    const exampleSentenceSpan = document.querySelector('#shanbay-example-sentence-span')
 
     /** 添加单词和忘记单词的事件处理*/
-    if (data.learning_id) {
-      document.querySelector('#shanbay-forget-word').addEventListener('click', function () {
-        chrome.runtime.sendMessage({action: 'forgetWord', learningId: data.learning_id})
+    const addWordSpan = document.querySelector('#shanbay-add-word-span')
+    const addWordBtn = document.querySelector('#shanbay-add-word-btn')
+    if (data.exists === true) {
+      addWordBtn.addEventListener('click', function () {
+        chrome.runtime.sendMessage({action: 'addOrForget', word: data.content, wordID: data.id})
       })
-    } else {
+    } else if (data.exists === false){
       if (storage.addBook) {
-        document.querySelector('#shanbay-add-word').className = 'hide'
-        document.querySelector('#shanbay-under-adding').className = ''
-        chrome.runtime.sendMessage({action: 'addWord', id: data.id})
+        addWordBtn.className = 'hide'
+        chrome.runtime.sendMessage({action: 'addOrForget', word: data.content, wordID: data.id})
       } else {
-        document.querySelector('#shanbay-add-word').addEventListener('click', function () {
-          document.querySelector('#shanbay-add-word').className = 'hide'
-          document.querySelector('#shanbay-under-adding').className = ''
-          chrome.runtime.sendMessage({action: 'addWord', id: data.id})
+        addWordBtn.addEventListener('click', function () {
+          chrome.runtime.sendMessage({action: 'addOrForget', word: data.content, wordID: data.id})
         })
       }
     }
 
-  } else if (res.status_code === 1) {
-    /** 查询单词或单词的其他操作失败*/
-    // 查询正常，但是没有这个单词
-    document.querySelector('#shanbay-popover #shanbay-inner').innerHTML = '<div id="shanbay-title" style="border: none;">没有找到这个单词</div>'
-  } else {
-    /** 未预料的状态*/
-    let m = '哇塞，非常罕见的错误哎，请 <a href="https://github.com/maicss/chrome-shanbay-v2/issues">告诉我</a>你怎么发现这个错误的。我会尽快处理的，嗯嗯。'
-    document.querySelector('#shanbay-popover #shanbay-title').innerHTML = m
-    console.error(m, JSON.stringify(res))
+    if (!storage.exampleSentence) {
+      exampleSentenceSpan.interHtml = ''
+    } else {
+      exampleSentenceBtn.addEventListener('click', () => {
+        chrome.runtime.sendMessage({action: 'getWordExample', id: data.id})
+      })
+    }
+
   }
 }
 
-/** 与background 交互，返回信息的处理*/
+/** 与 background 交互，返回信息的处理 */
 chrome.runtime.onMessage.addListener(function (res, sender) {
-  let addResult
+  const addWordSpan = document.querySelector('#shanbay-add-word-span')
+  const exampleSentenceDiv = document.querySelector('#shanbay-example-sentence-div')
+  const exampleSentenceSpan = document.querySelector('#shanbay-example-sentence-span')
   switch (res.action) {
     case 'lookup':
-      popover(res.data)
+      popover({loading: false, data: res.data})
       break
-    case 'addWord':
-      document.querySelector('#shanbay-under-adding').className = 'hide'
-      addResult = document.querySelector('#shanbay-add-result')
-      addResult.className = ''
-      if (res.data.msg === 'SUCCESS') {
-        addResult.innerHTML = `成功加入生词库！`
+    case 'addOrForget':
+      if (res.data.errors === 'SUCCESS') {
+        addWordSpan.innerHTML = '添加失败'
       } else {
-        addResult.innerHTML = '单词添加失败，请重试'
+        addWordSpan.innerHTML = '添加成功'
       }
       break
-    case 'forgetWord':
-      document.querySelector('#shanbay-forget-word').className = 'hide'
-      addResult = document.querySelector('#shanbay-add-result')
-      addResult.className = ''
-      if (res.data.msg === 'SUCCESS') {
-        addResult.innerHTML = `成功加入生词库！`
-      } else {
-        addResult.innerHTML = '单词添加失败，请重试'
-      }
+    case 'getWordExample':
+      exampleSentenceDiv.innerHTML = res.data.map((item, index) => `<p>${index + 1}, ${item.content_en} <span class="speaker" data-target="${item.audio.us.urls[0]}"></span></p><p>  ${item.content_cn}</p>`).join('')
+      exampleSentenceDiv.className = 'simple-definition'
+      exampleSentenceSpan.innerHTML = ''
+      Array.from(exampleSentenceDiv.querySelectorAll('.speaker').forEach(dom => {
+        dom.addEventListener('click', function () {
+          chrome.runtime.sendMessage({action: 'playSound', url: this.dataset.target})
+        })
+      }))
       break
   }
 })
-
-const getSelectionPosition = (range) => {
   /**
    * 得到弹出框的绝对位置 和 弹出框箭头的位置
    * @function getSelectionPosition
    * @param {object} range Range的实例
-   * @example
-   * return {left: 100, top: 100, distance: 10}
-   * @return {object}
-   * @return {number} top 弹出框的位置
-   * @return {number} left 弹出框的位置
-   * @return {number} distance 箭头的偏移量
+   * @return {{left: number, top: number, distance: number}}
    * */
+const getSelectionPosition = (range) => {
+
   /** 选区的范围数据*/
   let {left, top, height, width} = range.getBoundingClientRect()
   /** 280 是弹出框设置的宽度*/
@@ -239,15 +237,15 @@ const getSelectionPosition = (range) => {
   }
   return {left, top, distance}
 }
-
-const hidePopover = (delay) => {
   /**
    * 隐藏弹出框
    * @function hidePopover
    * @param {number} delay, ms 隐藏弹出框的延迟
    * */
+const hidePopover = (delay) => {
+
   setTimeout(function () {
-    selectionParentBody.removeChild(document.querySelector('#shanbay-popover'))
+    selectionParentBody.removeChild(document.querySelector('#__shanbay-popover'))
     selectionParentBody = null
   }, delay || 0)
 }
@@ -258,7 +256,7 @@ if (document.addEventListener || event.type === 'load' || document.readyState ==
   document.addEventListener('dblclick', pendingSearchSelection)
   document.addEventListener('click', function (e) {
     /** 屏蔽弹出框的双击事件*/
-    const _popover = document.querySelector('#shanbay-popover')
+    const _popover = document.querySelector('#__shanbay-popover')
     if (_popover && selectionParentBody) {
       if (!e.path.some(ele => ele === _popover)) {
         hidePopover()

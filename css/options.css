@@ -1,8 +1,9 @@
 #main {
   width: 500px;
   margin: 20px auto;
-  background-color: #94a9a3;
+  background-color: #ebebeb;
   padding: 20px;
+  box-shadow: 5px 5px 5px 3px  #d4d4d4;
   border-radius: 6px;
 }
 

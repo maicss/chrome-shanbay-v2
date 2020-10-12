@@ -4,7 +4,8 @@ window.__shanbayExtensionAuthInfo = {
     chrome.cookies.getAll({url: 'https://www.shanbay.com'}, cookies => {
       this.user = (cookies.find(cookie => cookie.name === 'userid') || {}).value
       const auth_token = (cookies.find(cookie => cookie.name === 'auth_token') || {}).value
-      callback(auth_token && auth_token.length > 0)
+      console.log(auth_token)
+      callback(auth_token)
     })
   }
 }
@@ -26,19 +27,20 @@ const playSound = url => {
 chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
   switch (req.action) {
     case 'lookup':
-      lookUp(req.word).then(res => {
-        chrome.tabs.sendMessage(sender.tab.id, {'action': 'lookup', data: res})
+      lookUp(req.word)
+        .then(res => checkWordAdded(res.id).then(existsRes => {res.exists = existsRes.objects[0].exists; return res}).catch(e => {console.error('查询单词是否存在于单词本失败', e); res.exists = 'error'; return res}))
+        .then(data => chrome.tabs.sendMessage(sender.tab.id, {'action': 'lookup', data}))
+        .catch(data => chrome.tabs.sendMessage(sender.tab.id, {'action': 'lookup', data}))
+      break
+    case 'addOrForget':
+      addOrForget(req.word, req.wordID).then(res => {
+        chrome.tabs.sendMessage(sender.tab.id, {'action': 'addOrForget', data: res})
       })
       break
-    case 'addWord':
-      addWord(req.id).then(res => {
-        chrome.tabs.sendMessage(sender.tab.id, {'action': 'addWord', data: res})
-      })
-      break
-    case 'forgetWord':
-      forget(req.learningId).then(res => {
-        chrome.tabs.sendMessage(sender.tab.id, {'action': 'forgetWord', data: res})
-      })
+    case 'getWordExample':
+      getWordExampleSentence(req.id)
+        .then(data => chrome.tabs.sendMessage(sender.tab.id, {'action': 'getWordExample', data}))
+        .catch(data => chrome.tabs.sendMessage(sender.tab.id, {'action': 'getWordExample', data}))
       break
     case 'playSound':
       playSound(req.url)
