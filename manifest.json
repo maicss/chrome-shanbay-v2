@@ -29,7 +29,7 @@
         "js/const.js",
         "js/main.js"
       ],
-      "matches": ["<all_urls>"],
+      "matches": ["http://*/*", "https://*/*"],
       "exclude_matches": [
         "*://*.shanbay.com/*", 
         "*://*.hjenglish.com/*", 
@@ -44,7 +44,6 @@
     "contextMenus",
     "tabs",
     "storage",
-    "notifications",
-    "*://*/*"
+    "notifications"
   ]
 }
