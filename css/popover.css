@@ -113,6 +113,10 @@
   border-bottom: 1px solid #ebebeb;
 }
 
+#__shanbay-popover #shanbay-title.has-error {
+  color: rgb(235, 122, 122)
+}
+
 #__shanbay-popover #shanbay-content {
   padding: 9px 14px !important;
 }
@@ -129,6 +133,7 @@
 
 #__shanbay-popover #shanbay-content #footer {
   overflow: hidden;
+  background-color: transparent;
 }
 
 #__shanbay-popover #shanbay-content #shanbay-example-sentence-span {

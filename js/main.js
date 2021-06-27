@@ -101,8 +101,8 @@ const popover = (res) => {
   if (res.loading) {
     /** 查询之前和未登录的提示信息*/
     document.querySelector('#__shanbay-popover #shanbay-title').innerHTML = res.msg
-  } else if (res.data.errors) {
-    document.querySelector('#__shanbay-popover #shanbay-inner').innerHTML = `<div id="shanbay-title" style="border: none;">${res.data.msg}</div>`
+  } else if (res.data.msg) {
+    document.querySelector('#__shanbay-popover #shanbay-inner').innerHTML = `<div id="shanbay-title" class="has-error" style="border: none;">${res.data.msg}</div>`
   } else {
     /** 查询单词或者单词其他操作成功*/
     let data = res.data

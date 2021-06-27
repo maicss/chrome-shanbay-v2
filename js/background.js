@@ -30,6 +30,7 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
       lookUp(req.word)
         .then(res => checkWordAdded(res.id).then(existsRes => {res.exists = existsRes.objects[0].exists; return res}))
         .then(data => chrome.tabs.sendMessage(sender.tab.id, {'action': 'lookup', data}))
+        .catch(data => chrome.tabs.sendMessage(sender.tab.id, {'action': 'lookup', data}))
       break
     case 'addOrForget':
       addOrForget(req.word, req.wordID).then(res => {
