@@ -4,7 +4,7 @@ function renderUser () {
   const login = document.querySelector('#login')
 
   bg.__shanbayExtensionAuthInfo.checkAuth(function (auth) {
-    if (auth.length) {
+    if (auth && auth.length) {
       const batchAddBtn = document.querySelector('#batch-add')
       const learnBtn = document.querySelector('#begin-learning')
       const settingBtn = document.querySelector('#options')
