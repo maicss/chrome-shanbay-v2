@@ -1,15 +1,6 @@
-window.__shanbayExtensionAuthInfo = {
-  user: null,
-  checkAuth (callback) {
-    chrome.cookies.getAll({url: 'https://www.shanbay.com'}, cookies => {
-      this.user = (cookies.find(cookie => cookie.name === 'userid') || {}).value
-      const auth_token = (cookies.find(cookie => cookie.name === 'auth_token') || {}).value
-      console.log(auth_token)
-      callback(auth_token)
-    })
-  }
-}
+import {debugLogger, storageSettingMap} from './const.js'
 
+const storage = {}
 /*=====================使用web音频接口播放音频的方法==================*/
 const playSound = url => {
   const context = new AudioContext()
@@ -49,32 +40,35 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
   }
 })
 
-let taskTimer
-
-const getDailyTask = () => {
   /**
    * 每3小时检测一下今天的剩余单词数量, 必须登录扇贝之后才可以使用
    * @function getDailyTask
    * */
+const getDailyTask = () => {
+  const reminderName = 'remindAlarm'
   if (storage.alarm) {
-    taskTimer = setInterval(function () {
-      if (!storage.alarm) return clearInterval(taskTimer)
+    chrome.alarms.create(reminderName, {
+      delayInMinutes: 60,
+      periodInMinutes: 180
+    })
+    chrome.alarms.onAlarm.addListener(() => {
+      if (!storage.alarm) return chrome.alarms.clear(reminderName)
       debugLogger('log', 'send daily task request')
       request('https://www.shanbay.com/api/v1/bdc/stats/today/').then(r => {
 
         if (r.data.num_left === 0) {
-          chrome.browserAction.setBadgeText({text: ''})
+          chrome.action.setBadgeText({text: ''})
         } else {
-          chrome.browserAction.setBadgeText({text: r.data.num_left + ''})
+          chrome.action.setBadgeText({text: r.data.num_left + ''})
           notify({
             message: `今天还有${r.data.num_left}个单词需要复习`,
             url: 'https://www.shanbay.com/bdc/review/'
           })
         }
       }).catch(e => debugLogger('error', 'get daily task failed, cause: ', e))
-    }, 1000 * 60 * 60 * 3)
+    })
   } else {
-    if (taskTimer) clearInterval(taskTimer)
+    chrome.alarms.clear(reminderName)
   }
 }
 
@@ -94,7 +88,7 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
       Object.assign(storage, item)
     })
   } else {
-    storage = storageSettingMap
+    Object.assign(storage, storageSettingMap)
   }
 
   // contentMenu

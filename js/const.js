@@ -4,12 +4,6 @@
  * @copyright 2017-2020 maicss
  * */
 
-/**
- * 全局设置对象
- * @type {object}
- * */
-let storage = {}
-
 /** 检测是否是开发模式，用来控制日志的输出
  * @type {boolean}
  * */
@@ -23,7 +17,7 @@ const devMode = !('update_url' in chrome.runtime.getManifest())
  * @param {*} msg log信息
  * @summary 如果是任何情况下都要打印的信息，就用console，如果只是调试的信息，就用debugLogger
  * */
-const debugLogger = (level = 'log', ...msg) => {
+export const debugLogger = (level = 'log', ...msg) => {
   if (devMode) console[level](...msg)
 }
 
@@ -151,7 +145,6 @@ const extensionSpecification = [
   { 'autoRead': 'false', desc: '自动发音', enum: ['EN', 'US', 'false'] },
   { 'paraphrase': 'bilingual', desc: '默认释义', enum: ['Chinese', 'English', 'bilingual'] },
   { 'exampleSentence': true, desc: '显示例句按钮', enum: [true, false] },
-  // {'trend': true, desc: '添加Github trend导航', enum: [true, false]},
 ]
 /**
  * 由extensionSpecification去除描述和取值范围之后生成的真正能使用的数组
@@ -159,7 +152,7 @@ const extensionSpecification = [
  * @type {Array}
  * @see extensionSpecification
  * */
-const storageSettingArray = extensionSpecification.map(setting => {
+export const storageSettingArray = extensionSpecification.map(setting => {
   delete setting.enum
   delete setting.desc
   return setting
@@ -169,7 +162,7 @@ const storageSettingArray = extensionSpecification.map(setting => {
  * 由storageSettingArray数组生成的map
  * @type {Object}
  * */
-let storageSettingMap = {}
+export let storageSettingMap = {}
 storageSettingArray.forEach(item => {
   Object.assign(storageSettingMap, item)
 })

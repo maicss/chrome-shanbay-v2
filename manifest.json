@@ -1,35 +1,35 @@
 {
   "name": "扇贝助手v2",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "author": "maicss, jinntrance",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "description": "基于shanbay网页API查询并加入单词到生词本的应用",
   "icons": {
     "48": "images/icon_48.png"
   },
   "background": {
-    "scripts": [
-      "js/const.js",
-      "js/background.js"
-    ],
-    "persistent": false
+    "service_worker": "background.js",
+    "type": "module"
   },
-  "browser_action": {
+  "action": {
     "default_icon": "images/icon_48.png",
     "default_popup": "popup.html",
     "default_title": "扇贝助手v2"
   },
   "minimum_chrome_version": "54",
+  "web_accessible_resources": [{
+    "matches": ["<all_urls>"],
+    "resources": ["js/const.js"]
+  }],
   "content_scripts": [
     {
       "css": [
         "css/popover.css"
       ],
       "js": [
-        "js/const.js",
         "js/main.js"
       ],
-      "matches": ["http://*/*", "https://*/*"],
+      "matches": ["<all_urls>"],
       "exclude_matches": [
         "*://*.shanbay.com/*", 
         "*://*.hjenglish.com/*", 
@@ -44,6 +44,7 @@
     "contextMenus",
     "tabs",
     "storage",
+    "alarms",
     "notifications"
   ]
 }

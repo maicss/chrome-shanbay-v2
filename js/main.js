@@ -1,10 +1,8 @@
-/** add Github Trending*/
-// const addTends = () => {
-//   const ul = document.querySelector('header.Header ul[role="navigation"]')
-//     if (ul) ul.insertAdjacentHTML('beforeEnd', '<li><a class="js-selected-navigation-item HeaderNavlink px-0 py-2" href="/trending">Trending</a></li>')
-// }
+(async () => {
+  const src = chrome.runtime.getURL("js/const.js")
+  const {debugLogger, storageSettingMap} = await import(src)
 
-
+  const storage = {}
 /** 当前选区的父级body
  * @type {DOM(body) | null}
  * */
@@ -25,12 +23,8 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
       Object.assign(storage, item)
     })
   } else {
-    storage = storageSettingMap
+    Object.assign(storage, storageSettingMap)
   }
-
-  // if (storage.trend && location.href.startsWith('https://github.com')) {
-  //   addTends()
-  // }
 })
 
 /**
@@ -38,7 +32,6 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
  * */
 chrome.storage.onChanged.addListener(function (changes) {
   debugLogger('info', 'chrome storage changed')
-  storage = {}
   changes.__shanbayExtensionSettings.newValue.forEach(item => {
     Object.assign(storage, item)
   })
@@ -63,12 +56,14 @@ const pendingSearchSelection = (e) => {
     if (matchResult) {
       popover({
         loading: true,
-        msg: '查询中....（请确保已登录<a href="https://www.shanbay.com/">扇贝网</a>）'
+        msg: '查询中....（请确保已登录<a href="https://www.shanbay.com/">扇贝网</a>)'
       })
       debugLogger('info', 'get word: ', matchResult[0])
       chrome.runtime.sendMessage({
         action: 'lookup',
         word: matchResult[0]
+      }, (res) => {
+        debugLogger('info', 'send message response', res)
       })
     }
   } else {
@@ -120,23 +115,23 @@ const popover = (res) => {
       return str
     }
     let contentHtml = `
-<div id="shanbay-title">
-    <span class="word">${data.content}</span>
-    <a href="https://web.shanbay.com/wordsweb/#/detail/${data.id}" style="float: right;" target="_blank"> 查看详情 </a>
-    <div>${assemblyPronunciationStr()}</div>
-</div>
-<div id="shanbay-content">
-    <div class="simple-definition">
-        ${storage.paraphrase !== 'English' ? (data.definitions.cn.length ? `<div><strong>中文：</strong> ${data.definitions.cn.map(p => `<div><span>${p.pos} </span><span>${p.def}</span></div>`).join('')}</div>`: '') : ''}
-        ${ storage.paraphrase !== 'Chinese' ? (data.definitions.en.length ? `<div><strong>英文：</strong>${data.definitions.en.map(p => `<div><span>${p.pos} </span><span>${p.def}</span></div>`).join('')}</div>`: '') : ''}
-    </div>
-    <div id="shanbay-example-sentence-div" class="hide"></div>
-    <div id="footer">
-      <span id="shanbay-example-sentence-span"><button id="shanbay-example-sentence-btn" class="shanbay-btn">查看例句</button></span>
-      ${data.exists === 'error' ? '' : `<span id="shanbay-add-word-span"><button id="shanbay-add-word-btn" class="shanbay-btn ${data.exists ? 'forget' : ''}">${data.exists ? '我忘了' : '添加'}</button></span>`}
-    </div>
-</div>
-  `
+      <div id="shanbay-title">
+          <span class="word">${data.content}</span>
+          <a href="https://web.shanbay.com/wordsweb/#/detail/${data.id}" style="float: right;" target="_blank"> 查看详情 </a>
+          <div>${assemblyPronunciationStr()}</div>
+      </div>
+      <div id="shanbay-content">
+          <div class="simple-definition">
+              ${storage.paraphrase !== 'English' ? (data.definitions.cn.length ? `<div><strong>中文：</strong> ${data.definitions.cn.map(p => `<div><span>${p.pos} </span><span>${p.def}</span></div>`).join('')}</div>`: '') : ''}
+              ${ storage.paraphrase !== 'Chinese' ? (data.definitions.en.length ? `<div><strong>英文：</strong>${data.definitions.en.map(p => `<div><span>${p.pos} </span><span>${p.def}</span></div>`).join('')}</div>`: '') : ''}
+          </div>
+          <div id="shanbay-example-sentence-div" class="hide"></div>
+          <div id="footer">
+            <span id="shanbay-example-sentence-span"><button id="shanbay-example-sentence-btn" class="shanbay-btn">查看例句</button></span>
+            ${data.exists === 'error' ? '' : `<span id="shanbay-add-word-span"><button id="shanbay-add-word-btn" class="shanbay-btn ${data.exists ? 'forget' : ''}">${data.exists ? '我忘了' : '添加'}</button></span>`}
+          </div>
+      </div>
+    `
 
     document.querySelector('#__shanbay-popover #shanbay-inner').innerHTML = contentHtml
     /** 各种事件的处理*/
@@ -204,6 +199,11 @@ chrome.runtime.onMessage.addListener(function (res, sender) {
         })
       })
       break
+    case 'getAuthInfo':
+    chrome.cookies.getAll({url: 'https://www.shanbay.com'}, cookies => {
+      const auth_token = (cookies.find(cookie => cookie.name === 'auth_token') || {}).value
+      sender(auth_token)
+    })
   }
 })
   /**
@@ -258,10 +258,12 @@ if (document.addEventListener || event.type === 'load' || document.readyState ==
     /** 屏蔽弹出框的双击事件*/
     const _popover = document.querySelector('#__shanbay-popover')
     if (_popover && selectionParentBody) {
-      if (!e.path.some(ele => ele === _popover)) {
+      if (!e.composedPath().some(ele => ele === _popover)) {
         hidePopover()
       }
     }
   })
 // })
 }
+
+})();

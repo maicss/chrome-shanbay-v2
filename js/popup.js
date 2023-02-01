@@ -3,6 +3,12 @@ const bg = chrome.extension.getBackgroundPage()
 function renderUser () {
   const login = document.querySelector('#login')
 
+  chrome.runtime.sendMessage({
+    action: 'getAuthInfo'
+  }, res => {
+    console.log('popup get background auth info', res)
+  })
+
   bg.__shanbayExtensionAuthInfo.checkAuth(function (auth) {
     if (auth && auth.length) {
       const batchAddBtn = document.querySelector('#batch-add')
