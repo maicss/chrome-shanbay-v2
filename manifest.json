@@ -16,7 +16,7 @@
     "default_popup": "popup.html",
     "default_title": "扇贝助手v2"
   },
-  "minimum_chrome_version": "54",
+  "minimum_chrome_version": "88",
   "web_accessible_resources": [{
     "matches": ["<all_urls>"],
     "resources": ["js/const.js"]
