@@ -54,16 +54,11 @@ const pendingSearchSelection = (e) => {
     selectionParentBody = e.target.getRootNode().body
     let matchResult = getSelection().toString().trim().match(/^[a-zA-Z\s']+$/)
     if (matchResult) {
-      popover({
-        loading: true,
-        msg: '查询中....（请确保已登录<a href="https://www.shanbay.com/">扇贝网</a>)'
-      })
+      popover({loading: true, msg: '查询中....'})
       debugLogger('info', 'get word: ', matchResult[0])
       chrome.runtime.sendMessage({
         action: 'lookup',
         word: matchResult[0]
-      }, (res) => {
-        debugLogger('info', 'send message response', res)
       })
     }
   } else {
@@ -105,20 +100,24 @@ const popover = (res) => {
       if (!data.audios.length) return ''
       let str = ''
       if (data.audios[0].uk ) {
+        str += '<div>'
         str += `<span>uk: </span><small>/${data.audios[0].uk.ipa}/</small> `
         if (data.audios[0].uk.urls.length) str += `<span class="speaker" data-target="${data.audios[0].uk.urls[0]}"></span> `
+        str += '</div>'
       }
       if (data.audios[0].us ) {
+        str += '<div>'
         str += `<span>us: </span><small>/${data.audios[0].us.ipa}/</small> `
         if (data.audios[0].us.urls.length) str += `<span class="speaker" data-target="${data.audios[0].us.urls[0]}"></span> `
+        str += '</div>'
       }
       return str
     }
     let contentHtml = `
       <div id="shanbay-title">
           <span class="word">${data.content}</span>
-          <a href="https://web.shanbay.com/wordsweb/#/detail/${data.id}" style="float: right;" target="_blank"> 查看详情 </a>
-          <div>${assemblyPronunciationStr()}</div>
+          <a class="check-detail" href="https://web.shanbay.com/wordsweb/#/detail/${data.id}" target="_blank"> 查看详情 </a>
+          <div class="phonetic-symbols">${assemblyPronunciationStr()}</div>
       </div>
       <div id="shanbay-content">
           <div class="simple-definition">
@@ -145,7 +144,6 @@ const popover = (res) => {
     const exampleSentenceSpan = document.querySelector('#shanbay-example-sentence-span')
 
     /** 添加单词和忘记单词的事件处理*/
-    const addWordSpan = document.querySelector('#shanbay-add-word-span')
     const addWordBtn = document.querySelector('#shanbay-add-word-btn')
     if (data.exists === true) {
       addWordBtn.addEventListener('click', function () {
@@ -199,11 +197,6 @@ chrome.runtime.onMessage.addListener(function (res, sender) {
         })
       })
       break
-    case 'getAuthInfo':
-    chrome.cookies.getAll({url: 'https://www.shanbay.com'}, cookies => {
-      const auth_token = (cookies.find(cookie => cookie.name === 'auth_token') || {}).value
-      sender(auth_token)
-    })
   }
 })
   /**
@@ -230,7 +223,7 @@ const getSelectionPosition = (range) => {
     distance = popupWidth / 2 + left
     left = 0
   } else if (left + popupWidth > window.innerWidth) {
-    // 这里的10是为里防止右边边界出现的三角箭头出现在弹出框外面的情况，纯粹为了美观
+    // 这里的10是为里防止右边边界出现的三角箭头出现在弹出框外面的情况，为了美观
     // 最终的效果就是单词在右边边界的时候，会跟浏览器的边框有一定的距离，因为排版的原因，右边可能空出一大截，而且不会对齐，但是浏览器左边肯定都是对齐的，所以弹出框在左边的时候，一定是靠在浏览器边界的。
     distance = popupWidth / 2 + (left + popupWidth - windowWidth) - 10
     left = windowWidth + 10 - popupWidth

@@ -117,6 +117,15 @@
   color: rgb(235, 122, 122)
 }
 
+#__shanbay-popover #shanbay-title .check-detail {
+  float: right;
+}
+
+#__shanbay-popover #shanbay-title .phonetic-symbols {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 #__shanbay-popover #shanbay-content {
   padding: 9px 14px !important;
 }

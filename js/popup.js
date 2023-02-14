@@ -1,36 +1,31 @@
-const bg = chrome.extension.getBackgroundPage()
-
 function renderUser () {
   const login = document.querySelector('#login')
+  const batchAddBtn = document.querySelector('#batch-add')
+  const learnBtn = document.querySelector('#begin-learning')
+  const settingBtn = document.querySelector('#options')
+  login.onclick = function () {
+    chrome.tabs.create({
+      url: 'https://web.shanbay.com/web/account/login/'
+    })
+  }
 
   chrome.runtime.sendMessage({
     action: 'getAuthInfo'
-  }, res => {
-    console.log('popup get background auth info', res)
-  })
-
-  bg.__shanbayExtensionAuthInfo.checkAuth(function (auth) {
+  }, auth => {
+    console.log('popup get background auth info', auth)
     if (auth && auth.length) {
-      const batchAddBtn = document.querySelector('#batch-add')
-      const learnBtn = document.querySelector('#begin-learning')
-      const settingBtn = document.querySelector('#options')
+      login.className = 'hide'
       batchAddBtn.className = ''
       learnBtn.className = ''
       settingBtn.className = ''
     } else {
       login.className = ''
-      login.querySelector('a').onclick = function () {
-        chrome.tabs.create({
-          url: 'https://web.shanbay.com/web/account/login/'
-        })
-      }
-      notify({
-        title: '没有登录信息',
-        message: '没有获取到扇贝网的登录信息，点击登录。',
-        url: 'https://web.shanbay.com/web/account/login/'
-      })
+      batchAddBtn.className = 'hide'
+      learnBtn.className = 'hide'
+      settingBtn.className = 'hide'
     }
   })
+
 }
 
 document.addEventListener('DOMContentLoaded', function () {

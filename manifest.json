@@ -8,7 +8,7 @@
     "48": "images/icon_48.png"
   },
   "background": {
-    "service_worker": "background.js",
+    "service_worker": "js/background.js",
     "type": "module"
   },
   "action": {
@@ -38,6 +38,9 @@
         "*://*.jsbin.com/*"
       ]
     }
+  ],
+  "host_permissions": [
+    "*://*.shanbay.com/"
   ],
   "permissions": [
     "cookies",

@@ -1,4 +1,7 @@
-import {debugLogger, storageSettingMap} from './const.js'
+import {
+  debugLogger, storageSettingMap, request, lookUp, checkWordAdded,
+  addOrForget, getWordExampleSentence, 
+} from './const.js'
 
 const storage = {}
 /*=====================使用web音频接口播放音频的方法==================*/
@@ -34,6 +37,11 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
       break
     case 'playSound':
       playSound(req.url)
+      break
+    case 'getAuthInfo':
+      chrome.cookies.getAll({domain: 'shanbay.com', name: 'auth_token'}, cookies => {
+        sendResponse((cookies[0] || {}).value)
+      })
       break
     default:
       throw Error('Invalid action type')

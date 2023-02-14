@@ -29,7 +29,7 @@ export const debugLogger = (level = 'log', ...msg) => {
  * @param {string} [opt.message=少壮不努力，老大背单词] - notifications message
  * @param {string} [opt.url=https://www.shanbay.com/] - notifications url, notifications可以点击跳转
  * */
-const notify = (opt = {title: '人丑多读书', message: '少壮不努力，老大背单词', url: 'https://www.shanbay.com/'}) => {
+export const notify = (opt = {title: '人丑多读书', message: '少壮不努力，老大背单词', url: 'https://www.shanbay.com/'}) => {
   let hasNotified = false
   const options = {
     type: 'basic',
@@ -63,7 +63,7 @@ const notify = (opt = {title: '人丑多读书', message: '少壮不努力，老
  * @param {string} [options.type='buffer'] - whether need return buffer
  * @return Promise
  * */
-const request = (url, options = {}) => {
+export const request = (url, options = {}) => {
   options = Object.assign(options, { credentials: 'include' })
   return fetch(url, options)
     .then(res => {
@@ -71,8 +71,6 @@ const request = (url, options = {}) => {
         if (options.type === 'buffer') return res.arrayBuffer()
         return res.json()
       } else if (res.status === 401) {
-        notify({ title: '扇贝网登录信息已过期', message: '请点击本通知或去扇贝网重新登录，否者将不能使用添加单词、右键查词和背单词提醒等功能。', url: 'https://web.shanbay.com/web/account/login/' })
-        debugLogger('error', `[${new Date().toLocaleDateString()}] request failed ${options.method || 'GET'} ${url} ${JSON.stringify(res)}`)
         return Promise.reject({status: 401})
       } else {
         return Promise.reject(res.json ? res.json() : res.text())
@@ -80,7 +78,7 @@ const request = (url, options = {}) => {
     })
     // .catch(e => debugLogger('error', `[${new Date().toLocaleDateString()}] fetch failed ${options.method || 'GET'} ${url} ${JSON.stringify(e)}`))
     .catch(e => {
-      if (e.status === 400) {
+      if ([400, 401].includes(e.status)) {
         notify({
           title: '扇贝认证失败',
           message: '点击此消息登录',
@@ -173,11 +171,11 @@ storageSettingArray.forEach(item => {
  * @param {string} word - 需要查询的单词
  * @return Promise<object>
  * */
-const lookUp = word => request((shanbayAPI.lookUp.url).replace('{word}', word), {method: shanbayAPI.wordExample.method})
+export const lookUp = word => request((shanbayAPI.lookUp.url).replace('{word}', word), {method: shanbayAPI.wordExample.method})
 
-const checkWordAdded = wordID => request(shanbayAPI.wordCheck.url.replace('{id}', wordID), {method: shanbayAPI.wordExample.method})
+export const checkWordAdded = wordID => request(shanbayAPI.wordCheck.url.replace('{id}', wordID), {method: shanbayAPI.wordExample.method})
 
-const getWordExampleSentence = wordID => request(shanbayAPI.wordExample.url.replace('{id}', wordID), {method: shanbayAPI.wordExample.method})
+export const getWordExampleSentence = wordID => request(shanbayAPI.wordExample.url.replace('{id}', wordID), {method: shanbayAPI.wordExample.method})
 
 /** 
  * @description 添加单词到单词本或忘记单词
@@ -185,7 +183,7 @@ const getWordExampleSentence = wordID => request(shanbayAPI.wordExample.url.repl
  * @param {string} wordID - 单词id
  * @return Promise<object>
  */
-const addOrForget = (word, wordID) => request(shanbayAPI.addOrForget.url, {
+export const addOrForget = (word, wordID) => request(shanbayAPI.addOrForget.url, {
   method: shanbayAPI.addOrForget.method,
   headers: {'Content-Type': 'application/json'},
   body: JSON.stringify({"vocab_id": wordID,"business_id":2,"paragraph_id":"1","sentence_id":"A1","source_content":"","article_id":"ca","source_name":"","summary": word})
