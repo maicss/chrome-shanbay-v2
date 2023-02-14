@@ -77,15 +77,24 @@
                 </select>
             </p>
         </li>
-        <!--<li>-->
-            <!--<h3>Github trending</h3>-->
-            <!--<p>-->
-                <!--<label>-->
-                    <!--<input type="radio" name="trend" value="true" checked>是-->
-                    <!--<input type="radio" name="trend" value="false">否-->
-                <!--</label>-->
-            <!--</p>-->
-        <!--</li>-->
+        <li>
+            <h3>屏蔽站点</h3>
+            <div>
+                <p>避免<a href="https://github.com/maicss/chrome-shanbay-v2#%E5%B7%B2%E7%9F%A5%E7%9A%84%E9%97%AE%E9%A2%98">已知问题</a>的影响，可以把某些站点列入屏蔽站点。默认屏蔽站点：</p>
+                <ul class="ignore-sites">
+                    <li>shanbay.com</li>
+                    <li>hjenglish.com</li>
+                    <li>codepen.io</li>
+                    <li>jsfiddle.net</li>
+                    <li>jsbin.com</li>
+                    <li>codesandbox.io</li>
+                    <li>github1s.com</li>
+                </ul>
+                <label>
+                    <textarea name="ignoreSites" id="" cols="90" rows="10" placeholder="只添加域名，如：baidu.com，多个域名用回车分割"></textarea>
+                </label>
+            </div>
+        </li>
     </ul>
 
     <div id="saveP">

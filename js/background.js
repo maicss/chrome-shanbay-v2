@@ -23,17 +23,17 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
     case 'lookup':
       lookUp(req.word)
         .then(res => checkWordAdded(res.id).then(existsRes => {res.exists = existsRes.objects[0].exists; return res}))
-        .then(data => chrome.tabs.sendMessage(sender.tab.id, {'action': 'lookup', data}))
-        .catch(data => chrome.tabs.sendMessage(sender.tab.id, {'action': 'lookup', data}))
+        .then(data => chrome.tabs.sendMessage(sender.tab.id, {action: 'lookup', data}))
+        .catch(data => chrome.tabs.sendMessage(sender.tab.id, {action: 'lookup', data}))
       break
     case 'addOrForget':
       addOrForget(req.word, req.wordID).then(res => {
-        chrome.tabs.sendMessage(sender.tab.id, {'action': 'addOrForget', data: res})
+        chrome.tabs.sendMessage(sender.tab.id, {action: 'addOrForget', data: res})
       })
       break
     case 'getWordExample':
       getWordExampleSentence(req.id)
-        .then(data => chrome.tabs.sendMessage(sender.tab.id, {'action': 'getWordExample', data}))
+        .then(data => chrome.tabs.sendMessage(sender.tab.id, {action: 'getWordExample', data}))
       break
     case 'playSound':
       playSound(req.url)
@@ -103,19 +103,25 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
 
   // contentMenu
   chrome.contextMenus.removeAll(function () {
-    if (storage.contextLookup) {
-      debugLogger('info', 'contextMenu added')
-      chrome.contextMenus.create({
-        id: Math.random().toString(36),
-        title: '在扇贝网中查找 %s',
-        contexts: ['selection'],
-      })
-      chrome.contextMenus.onClicked.addListener((info, tab) => {
-        lookUp(info.selectionText).then(res => {
-          chrome.tabs.sendMessage(tab.id, {'action': 'lookup', data: res})
+    chrome.tabs.query({ active: true })
+    .then(tabs => {
+      const curUrl = tabs[0].url
+      if (storage.ignoreSites.some(site => curUrl.includes(site))) return
+      if (storage.contextLookup) {
+        debugLogger('info', 'contextMenu added')
+        chrome.contextMenus.create({
+          id: Math.random().toString(36),
+          title: '在扇贝网中查找 %s',
+          contexts: ['selection'],
         })
-      })
-    }
+        chrome.contextMenus.onClicked.addListener((info, tab) => {
+          lookUp(info.selectionText).then(res => {
+            chrome.tabs.sendMessage(tab.id, {action: 'lookup', data: res})
+          })
+        })
+      }
+    })
+    .catch()
   })
   getDailyTask()
 })

@@ -43,27 +43,33 @@ chrome.storage.onChanged.addListener(function (changes) {
    * 兼容性: node.getRootNode: chrome 54+
    * */
 const pendingSearchSelection = (e) => {
+  chrome.tabs.query({ active: true })
+    .then(tabs => {
+      const curUrl = tabs[0].url
+      if (storage.ignoreSites.some(site => curUrl.includes(site))) return
 
-  const _popover = document.querySelector('#__shanbay-popover')
-  if (_popover) return
-  let _selection = getSelection()
-  if (!_selection.rangeCount) return
-  let _range = getSelection().getRangeAt(0)
-  offset = getSelectionPosition(_range)
-  if (e && storage.clickLookup) {
-    selectionParentBody = e.target.getRootNode().body
-    let matchResult = getSelection().toString().trim().match(/^[a-zA-Z\s']+$/)
-    if (matchResult) {
-      popover({loading: true, msg: '查询中....'})
-      debugLogger('info', 'get word: ', matchResult[0])
-      chrome.runtime.sendMessage({
-        action: 'lookup',
-        word: matchResult[0]
-      })
-    }
-  } else {
-    selectionParentBody = _range.startContainer.ownerDocument.body
-  }
+      const _popover = document.querySelector('#__shanbay-popover')
+      if (_popover) return
+      let _selection = getSelection()
+      if (!_selection.rangeCount) return
+      let _range = getSelection().getRangeAt(0)
+      offset = getSelectionPosition(_range)
+      if (e && storage.clickLookup) {
+        selectionParentBody = e.target.getRootNode().body
+        let matchResult = getSelection().toString().trim().match(/^[a-zA-Z\s']+$/)
+        if (matchResult) {
+          popover({loading: true, msg: '查询中....'})
+          debugLogger('info', 'get word: ', matchResult[0])
+          chrome.runtime.sendMessage({
+            action: lookup,
+            word: matchResult[0]
+          })
+        }
+      } else {
+        selectionParentBody = _range.startContainer.ownerDocument.body
+      }
+    })
+    .catch()
 
 }
 
@@ -246,6 +252,7 @@ const hidePopover = (delay) => {
 if (document.addEventListener || event.type === 'load' || document.readyState === 'complete') {
 // document.addEventListener('DOMContentLoaded', function () {
   // console.log('Shanbay Extension DOMContentLoaded......')
+  if (chrome.tab)
   document.addEventListener('dblclick', pendingSearchSelection)
   document.addEventListener('click', function (e) {
     /** 屏蔽弹出框的双击事件*/

@@ -30,7 +30,6 @@ export const debugLogger = (level = 'log', ...msg) => {
  * @param {string} [opt.url=https://www.shanbay.com/] - notifications url, notifications可以点击跳转
  * */
 export const notify = (opt = {title: '人丑多读书', message: '少壮不努力，老大背单词', url: 'https://www.shanbay.com/'}) => {
-  let hasNotified = false
   const options = {
     type: 'basic',
     title: opt.title,
@@ -38,10 +37,7 @@ export const notify = (opt = {title: '人丑多读书', message: '少壮不努�
     iconUrl: '../images/icon_48.png',
   }
   let noteID = Math.random().toString(36)
-  chrome.notifications.create(noteID, options, (notifyID) => {
-    // debugLogger('log', `notification [${notifyID}] was created`)
-    hasNotified = true
-  })
+  chrome.notifications.create(noteID, options)
   chrome.notifications.onClicked.addListener(function (notifyID) {
     debugLogger('log', `notification [${notifyID}] was clicked`)
     chrome.notifications.clear(notifyID)
@@ -50,7 +46,6 @@ export const notify = (opt = {title: '人丑多读书', message: '少壮不努�
         url: opt.url
       })
     }
-    hasNotified = false
   })
 }
 
@@ -142,6 +137,7 @@ const extensionSpecification = [
   { 'autoRead': 'false', desc: '自动发音', enum: ['EN', 'US', 'false'] },
   { 'paraphrase': 'bilingual', desc: '默认释义', enum: ['Chinese', 'English', 'bilingual'] },
   { 'exampleSentence': true, desc: '显示例句按钮', enum: [true, false] },
+  { 'ignoreSites': true, desc: '忽略站点' },
 ]
 /**
  * 由extensionSpecification去除描述和取值范围之后生成的真正能使用的数组
