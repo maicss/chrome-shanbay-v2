@@ -35,7 +35,9 @@
         "*://*.hjenglish.com/*", 
         "*://*.codepen.io/*",
         "*://*.jsfiddle.net/*",
-        "*://*.jsbin.com/*"
+        "*://*.jsbin.com/*",
+        "*://*.codesandbox.io/*",
+        "*://*.github1s.com/*"
       ]
     }
   ],

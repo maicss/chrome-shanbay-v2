@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
   document.querySelector('#save').onclick = function () {
+    this.disabled = true
     let _settings = getOptions()
     chrome.storage.sync.set({__shanbayExtensionSettings: _settings}, () => {
       console.log('lastError in options js: ', chrome.runtime.lastError)
@@ -80,6 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
         saveRes.className = ''
         setTimeout(function () {
           saveRes.className = 'hide'
+          this.disabled = false
         }, 1000)
       }
       debugLogger('log', '__shanbayExtensionSettings settled.')

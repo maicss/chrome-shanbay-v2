@@ -40,12 +40,14 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
       break
     case 'getAuthInfo':
       chrome.cookies.getAll({domain: 'shanbay.com', name: 'auth_token'}, cookies => {
+        console.log('request getAuthInfo', cookies)
         sendResponse((cookies[0] || {}).value)
       })
       break
     default:
       throw Error('Invalid action type')
   }
+  return true
 })
 
   /**
