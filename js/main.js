@@ -13,6 +13,8 @@ let selectionParentBody = null
  * */
 let offset = null
 
+
+console.log("debugLogger: ", debugLogger);
 /**
  * 从chrome的storage里获取存储的插件的设置，如果有值，就给storage赋值，否者就使用默认的storageSettingMap
  * */
@@ -31,11 +33,13 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
  * 监听设置变化的事件，如果修改了设置，就更新全局的storage的值
  * */
 chrome.storage.onChanged.addListener(function (changes) {
-  debugLogger('info', 'chrome storage changed')
+  debugLogger('info', 'chrome storage changed', changes);
+
   changes.__shanbayExtensionSettings.newValue.forEach(item => {
     Object.assign(storage, item)
   })
 })
+
   /**
    * 双击事件和右键选中后的事件处理器。
    * @function pendingSearchSelection
@@ -43,10 +47,11 @@ chrome.storage.onChanged.addListener(function (changes) {
    * 兼容性: node.getRootNode: chrome 54+
    * */
 const pendingSearchSelection = (e) => {
-  chrome.tabs.query({ active: true })
-    .then(tabs => {
-      const curUrl = tabs[0].url
-      if (storage.ignoreSites.some(site => curUrl.includes(site))) return
+  // chro me.t abs.que ry({ active: true })
+  //   .then(tabs => {
+      // const curUrl = tabs[0].url
+      const curUrl = window.location.href
+      // if (storag e.ig noreSite s .s o me (s . i te => curUrl.includes(site))) return
 
       const _popover = document.querySelector('#__shanbay-popover')
       if (_popover) return
@@ -61,15 +66,15 @@ const pendingSearchSelection = (e) => {
           popover({loading: true, msg: '查询中....'})
           debugLogger('info', 'get word: ', matchResult[0])
           chrome.runtime.sendMessage({
-            action: lookup,
+            action: 'lookup',
             word: matchResult[0]
           })
         }
       } else {
         selectionParentBody = _range.startContainer.ownerDocument.body
       }
-    })
-    .catch()
+    // })
+    // .catch()
 
 }
 
@@ -251,19 +256,26 @@ const hidePopover = (delay) => {
 
 if (document.addEventListener || event.type === 'load' || document.readyState === 'complete') {
 // document.addEventListener('DOMContentLoaded', function () {
-  // console.log('Shanbay Extension DOMContentLoaded......')
+  console.log('Shanbay Extension DOMContentLoaded......');
+
   if (chrome.tab)
-  document.addEventListener('dblclick', pendingSearchSelection)
-  document.addEventListener('click', function (e) {
-    /** 屏蔽弹出框的双击事件*/
-    const _popover = document.querySelector('#__shanbay-popover')
-    if (_popover && selectionParentBody) {
-      if (!e.composedPath().some(ele => ele === _popover)) {
-        hidePopover()
+    console.log("reg dblclick click")
+    document.addEventListener('dblclick', pendingSearchSelection)
+    document.addEventListener('click', function (e) {
+      /** 屏蔽弹出框的双击事件*/
+      const _popover = document.querySelector('#__shanbay-popover')
+      if (_popover && selectionParentBody) {
+        if (!e.composedPath().some(ele => ele === _popover)) {
+          hidePopover()
+        }
       }
-    }
   })
 // })
 }
+
+
+console.log("ext main.js injected!");
+
+
 
 })();

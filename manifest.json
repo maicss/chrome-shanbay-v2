@@ -1,6 +1,6 @@
 {
-  "name": "扇贝助手v2",
-  "version": "2.0.3",
+  "name": "扇贝助手v3",
+  "version": "3.0.3",
   "author": "maicss, jinntrance",
   "manifest_version": 3,
   "description": "基于shanbay网页API查询并加入单词到生词本的应用",
@@ -14,9 +14,9 @@
   "action": {
     "default_icon": "images/icon_48.png",
     "default_popup": "popup.html",
-    "default_title": "扇贝助手v2"
+    "default_title": "扇贝助手v3"
   },
-  "minimum_chrome_version": "88",
+  "minimum_chrome_version": "110",
   "web_accessible_resources": [{
     "matches": ["<all_urls>"],
     "resources": ["js/const.js"]
@@ -50,6 +50,8 @@
     "tabs",
     "storage",
     "alarms",
-    "notifications"
+    "notifications",
+    "activeTab",
+    "offscreen"
   ]
 }

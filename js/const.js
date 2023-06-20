@@ -17,7 +17,7 @@ const devMode = !('update_url' in chrome.runtime.getManifest())
  * @param {*} msg log信息
  * @summary 如果是任何情况下都要打印的信息，就用console，如果只是调试的信息，就用debugLogger
  * */
-export const debugLogger = (level = 'log', ...msg) => {
+const debugLogger = (level = 'log', ...msg) => {
   if (devMode) console[level](...msg)
 }
 
@@ -29,7 +29,7 @@ export const debugLogger = (level = 'log', ...msg) => {
  * @param {string} [opt.message=少壮不努力，老大背单词] - notifications message
  * @param {string} [opt.url=https://www.shanbay.com/] - notifications url, notifications可以点击跳转
  * */
-export const notify = (opt = {title: '人丑多读书', message: '少壮不努力，老大背单词', url: 'https://www.shanbay.com/'}) => {
+const notify = (opt = {title: '人丑多读书', message: '少壮不努力，老大背单词', url: 'https://www.shanbay.com/'}) => {
   const options = {
     type: 'basic',
     title: opt.title,
@@ -58,7 +58,7 @@ export const notify = (opt = {title: '人丑多读书', message: '少壮不努�
  * @param {string} [options.type='buffer'] - whether need return buffer
  * @return Promise
  * */
-export const request = (url, options = {}) => {
+const request = (url, options = {}) => {
   return fetch(url, Object.assign(options, { credentials: 'include' }))
     .then(res => {
       if (res.ok) {
@@ -145,7 +145,7 @@ const extensionSpecification = [
  * @type {Array}
  * @see extensionSpecification
  * */
-export const storageSettingArray = extensionSpecification.map(setting => {
+const storageSettingArray = extensionSpecification.map(setting => {
   delete setting.enum
   delete setting.desc
   return setting
@@ -155,7 +155,7 @@ export const storageSettingArray = extensionSpecification.map(setting => {
  * 由storageSettingArray数组生成的map
  * @type {Object}
  * */
-export let storageSettingMap = {}
+let storageSettingMap = {}
 storageSettingArray.forEach(item => {
   Object.assign(storageSettingMap, item)
 })
@@ -166,11 +166,11 @@ storageSettingArray.forEach(item => {
  * @param {string} word - 需要查询的单词
  * @return Promise<object>
  * */
-export const lookUp = word => request((shanbayAPI.lookUp.url).replace('{word}', word), {method: shanbayAPI.wordExample.method})
+const lookUp = word => request((shanbayAPI.lookUp.url).replace('{word}', word), {method: shanbayAPI.wordExample.method})
 
-export const checkWordAdded = wordID => request(shanbayAPI.wordCheck.url.replace('{id}', wordID), {method: shanbayAPI.wordExample.method})
+const checkWordAdded = wordID => request(shanbayAPI.wordCheck.url.replace('{id}', wordID), {method: shanbayAPI.wordExample.method})
 
-export const getWordExampleSentence = wordID => request(shanbayAPI.wordExample.url.replace('{id}', wordID), {method: shanbayAPI.wordExample.method})
+const getWordExampleSentence = wordID => request(shanbayAPI.wordExample.url.replace('{id}', wordID), {method: shanbayAPI.wordExample.method})
 
 /** 
  * @description 添加单词到单词本或忘记单词
@@ -178,8 +178,21 @@ export const getWordExampleSentence = wordID => request(shanbayAPI.wordExample.u
  * @param {string} wordID - 单词id
  * @return Promise<object>
  */
-export const addOrForget = (word, wordID) => request(shanbayAPI.addOrForget.url, {
+const addOrForget = (word, wordID) => request(shanbayAPI.addOrForget.url, {
   method: shanbayAPI.addOrForget.method,
   headers: {'Content-Type': 'application/json'},
   body: JSON.stringify({"vocab_id": wordID,"business_id":2,"paragraph_id":"1","sentence_id":"A1","source_content":"","article_id":"ca","source_name":"","summary": word})
 })
+
+
+export {
+  debugLogger,
+  notify,
+  lookUp,
+  checkWordAdded,
+  getWordExampleSentence,
+  addOrForget,
+  request,
+  storageSettingArray,
+  storageSettingMap
+}

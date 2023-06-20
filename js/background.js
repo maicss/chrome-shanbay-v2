@@ -3,22 +3,71 @@ import {
   addOrForget, getWordExampleSentence, 
 } from './const.js'
 
+
+/**
+ * Plays audio files from extension service workers
+ * @param {string} source - path of the audio file
+ * @param {number} volume - volume of the playback
+ */
+// async function NewPlaySound(source = 'default.wav', volume = 1) {
+//   await createOffscreen();
+//   await chrome.runtime.sendMessage({ play: { source, volume } });
+// }
+
+// Create the offscreen document if it doesn't already exist
+
+async function createOffscreen() {
+  if (await chrome.offscreen.hasDocument()) return;
+  await chrome.offscreen.createDocument({
+      url: 'offscreen.html',
+      reasons: ['AUDIO_PLAYBACK'],
+      justification: 'testing' // details for using the API
+  });
+}
+
+
+
 const storage = {}
 /*=====================使用web音频接口播放音频的方法==================*/
 const playSound = url => {
-  const context = new AudioContext()
+  console.log("DoPlaySound");
+
   request(url, {type: 'buffer'}).then(r => {
-    context.decodeAudioData(r, function (buffer) {
-      const source = context.createBufferSource()
-      source.buffer = buffer
-      source.connect(context.destination)
-      source.start(0)
+    console.log("Get Url: ", url);
+
+    console.log('offscreen', chrome.offscreen);
+
+    createOffscreen().then(()=>{
+      console.log("create done!");
+
+      // let source = url;
+      // let volume = 50;
+      // chrome.runtime.sendMessage({ play: { source, volume } }).then(()=> {
+      //   console.log('send done!')
+      // })
+
+      let action = 'playSound';
+      const target = 'offscreen';
+      chrome.runtime.sendMessage({action, target, url}).then(()=>{
+        console.log("background.js send message!")
+      })
     })
+    // const context = new AudioContext()
+    // context.decodeAudioData(r, function (buffer) {
+    //   const source = context.createBufferSource()
+    //   source.buffer = buffer
+    //   source.connect(context.destination)
+    //   source.start(0)
+    // })
+
+
   })
+
 }
 /*=================================================================*/
 
 chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
+  console.log("req: ", req)
   switch (req.action) {
     case 'lookup':
       lookUp(req.word)
@@ -83,6 +132,8 @@ const getDailyTask = () => {
 }
 
 chrome.storage.onChanged.addListener(changes => {
+  console.log("changes", changes);
+
   const settings = changes.__shanbayExtensionSettings.newValue
   if (Object.keys(settings).length) {
     settings.forEach(item => {
@@ -106,7 +157,7 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
     chrome.tabs.query({ active: true })
     .then(tabs => {
       const curUrl = tabs[0].url
-      if (storage.ignoreSites.some(site => curUrl.includes(site))) return
+      // if (storage.ignoreSites.some(site => curUrl.includes(site))) return
       if (storage.contextLookup) {
         debugLogger('info', 'contextMenu added')
         chrome.contextMenus.create({
