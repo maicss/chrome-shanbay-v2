@@ -39,10 +39,10 @@ chrome.storage.onChanged.addListener(function (changes) {
   /**
    * 双击事件和右键选中后的事件处理器。
    * @function pendingSearchSelection
-   * @param {object}[e] - 双击事件的对象
+   * @param {object}[event] - 双击事件的对象
    * 兼容性: node.getRootNode: chrome 54+
    * */
-const pendingSearchSelection = (e) => {
+const pendingSearchSelection = (event) => {
   chrome.tabs.query({ active: true })
     .then(tabs => {
       const curUrl = tabs[0].url
@@ -54,8 +54,8 @@ const pendingSearchSelection = (e) => {
       if (!_selection.rangeCount) return
       let _range = getSelection().getRangeAt(0)
       offset = getSelectionPosition(_range)
-      if (e && storage.clickLookup) {
-        selectionParentBody = e.target.getRootNode().body
+      if (event && storage.clickLookup) {
+        selectionParentBody = event.target.getRootNode().body
         let matchResult = getSelection().toString().trim().match(/^[a-zA-Z\s']+$/)
         if (matchResult) {
           popover({loading: true, msg: '查询中....'})
@@ -252,7 +252,7 @@ const hidePopover = (delay) => {
 if (document.addEventListener || event.type === 'load' || document.readyState === 'complete') {
 // document.addEventListener('DOMContentLoaded', function () {
   // console.log('Shanbay Extension DOMContentLoaded......')
-  if (chrome.tab)
+  // if (chrome.tab)
   document.addEventListener('dblclick', pendingSearchSelection)
   document.addEventListener('click', function (e) {
     /** 屏蔽弹出框的双击事件*/

@@ -137,7 +137,7 @@ const extensionSpecification = [
   { 'autoRead': 'false', desc: '自动发音', enum: ['EN', 'US', 'false'] },
   { 'paraphrase': 'bilingual', desc: '默认释义', enum: ['Chinese', 'English', 'bilingual'] },
   { 'exampleSentence': true, desc: '显示例句按钮', enum: [true, false] },
-  { 'ignoreSites': true, desc: '忽略站点' },
+  { 'ignoreSites': [], desc: '忽略站点' },
 ]
 /**
  * 由extensionSpecification去除描述和取值范围之后生成的真正能使用的数组

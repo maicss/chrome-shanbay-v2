@@ -3,17 +3,33 @@ import {
   addOrForget, getWordExampleSentence, 
 } from './const.js'
 
+
+/**
+ * Plays audio files from extension service workers
+ * @param {string} source - path of the audio file
+ * @param {number} volume - volume of the playback
+ */
+async function createOffscreen() {
+  if (await chrome.offscreen.hasDocument()) return;
+  await chrome.offscreen.createDocument({
+      url: 'offscreen.html',
+      reasons: ['AUDIO_PLAYBACK'],
+      justification: 'testing'
+  });
+}
+
 const storage = {}
 /*=====================使用web音频接口播放音频的方法==================*/
 const playSound = url => {
-  const context = new AudioContext()
   request(url, {type: 'buffer'}).then(r => {
-    context.decodeAudioData(r, function (buffer) {
-      const source = context.createBufferSource()
-      source.buffer = buffer
-      source.connect(context.destination)
-      source.start(0)
+    createOffscreen().then(()=>{
+      let action = 'playSound';
+      const target = 'offscreen';
+      chrome.runtime.sendMessage({action, target, url}).then(()=>{
+        debugLogger('log', "background.js send message!")
+      })
     })
+    .catch()
   })
 }
 /*=================================================================*/
