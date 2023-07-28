@@ -1,6 +1,7 @@
 (async () => {
-  const src = chrome.runtime.getURL("js/const.js")
-  const {debugLogger, storageSettingMap} = await import(src)
+  const src = chrome.runtime.getURL("js/const.mjs")
+  const {debugLogger, storageSettingMap, defaultIgnoreSites} = await import(src)
+  // import {debugLogger, storageSettingMap, defaultIgnoreSites} from './const.mjs'
 
   const storage = {}
 /** 当前选区的父级body
@@ -43,33 +44,30 @@ chrome.storage.onChanged.addListener(function (changes) {
    * 兼容性: node.getRootNode: chrome 54+
    * */
 const pendingSearchSelection = (event) => {
-  chrome.tabs.query({ active: true })
-    .then(tabs => {
-      const curUrl = tabs[0].url
-      if (storage.ignoreSites.some(site => curUrl.includes(site))) return
 
-      const _popover = document.querySelector('#__shanbay-popover')
-      if (_popover) return
-      let _selection = getSelection()
-      if (!_selection.rangeCount) return
-      let _range = getSelection().getRangeAt(0)
-      offset = getSelectionPosition(_range)
-      if (event && storage.clickLookup) {
-        selectionParentBody = event.target.getRootNode().body
-        let matchResult = getSelection().toString().trim().match(/^[a-zA-Z\s']+$/)
-        if (matchResult) {
-          popover({loading: true, msg: '查询中....'})
-          debugLogger('info', 'get word: ', matchResult[0])
-          chrome.runtime.sendMessage({
-            action: lookup,
-            word: matchResult[0]
-          })
-        }
-      } else {
-        selectionParentBody = _range.startContainer.ownerDocument.body
+    if (defaultIgnoreSites.some(site => location.hostname.includes(site))) return
+    if (storage.ignoreSites.some(site => location.hostname.includes(site))) return
+
+    const _popover = document.querySelector('#__shanbay-popover')
+    if (_popover) return
+    let _selection = getSelection()
+    if (!_selection.rangeCount) return
+    let _range = getSelection().getRangeAt(0)
+    offset = getSelectionPosition(_range)
+    if (event && storage.clickLookup) {
+      selectionParentBody = event.target.getRootNode().body
+      let matchResult = getSelection().toString().trim().match(/^[a-zA-Z\s']+$/)
+      if (matchResult) {
+        popover({loading: true, msg: '查询中....'})
+        debugLogger('info', 'get word: ', matchResult[0])
+        chrome.runtime.sendMessage({
+          action: 'lookup',
+          word: matchResult[0]
+        })
       }
-    })
-    .catch()
+    } else {
+      selectionParentBody = _range.startContainer.ownerDocument.body
+    }
 
 }
 

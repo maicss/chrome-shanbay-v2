@@ -1,3 +1,5 @@
+import {debugLogger, defaultIgnoreSites} from './const.mjs'
+
 function renderUser () {
   const login = document.querySelector('#login')
   const batchAddBtn = document.querySelector('#batch-add')

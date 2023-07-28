@@ -19,7 +19,7 @@
   "minimum_chrome_version": "88",
   "web_accessible_resources": [{
     "matches": ["<all_urls>"],
-    "resources": ["js/const.js"]
+    "resources": ["js/const.mjs"]
   }],
   "content_scripts": [
     {
@@ -27,7 +27,7 @@
         "css/popover.css"
       ],
       "js": [
-        "js/main.js"
+        "js/main.mjs"
       ],
       "matches": ["<all_urls>"],
       "exclude_matches": [

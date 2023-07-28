@@ -1,4 +1,11 @@
+import {debugLogger, defaultIgnoreSites, storageSettingArray} from './const.mjs'
+
+const renderDefaultIgnoreSites = () => {
+  document.querySelector('.ignore-sites').innerHTML = defaultIgnoreSites.map(site => `<li>${site}</li>`).join('')
+}
+
 const renderOptions = (settings) => {
+  renderDefaultIgnoreSites()
   /**
    * 根据配置渲染页面的方法
    * @param settings: 页面配置的数组
@@ -6,21 +13,28 @@ const renderOptions = (settings) => {
   settings.forEach(setting => {
     let name = Object.keys(setting)[0]
     let value = setting[name]
-    let inputs = document.querySelectorAll(`input[name="${name}"]`)
-    if (inputs.length) {
-      if (inputs[0].type === 'checkbox') {
-        inputs[0].checked = value
-      } else if (inputs[0].type === 'radio') {
+    let inputs
+    switch (setting.type) {
+      case 'text':
+        inputs = document.querySelectorAll(`input[name="${name}"]`)
+        inputs[0].value = value
+        break
+      case 'radio':
+        inputs = document.querySelectorAll(`input[name="${name}"]`);
         [].forEach.call(inputs, input => {
           if (input.value === value.toString()) {
             input.checked = true
           }
         })
-      } else {
-        inputs[0].value = value
-      }
-    } else {
-      document.querySelector(`select[name="${name}"]`).value = value
+        break
+      case 'select':
+        document.querySelector(`select[name="${name}"]`).value = value
+        break
+      case 'textarea':
+        document.querySelector(`textarea[name="${name}"]`).value = value.join('\n')
+        break
+      default:
+        throw new ErrorEvent('invalid option form input type: ',  + setting.type)
     }
 
   })
@@ -36,27 +50,45 @@ const getOptions = () => {
   ;[].forEach.call(inputs, input => {
     if (input.type === 'checkbox') {
       settings.push({
-        [input.name]: input.checked
+        [input.name]: input.checked,
+        type: 'checkbox'
       })
     } else if (input.type === 'radio') {
       if (input.checked) {
         settings.push({
-          [input.name]: input.value === 'true'
+          [input.name]: input.value === 'true',
+          type: 'radio'
         })
       }
 
     } else {
       settings.push({
-        [input.name]: input.value
+        [input.name]: input.value,
+        type: 'text'
       })
     }
   })
   const selects = document.querySelectorAll('select')
   ;[].forEach.call(selects, select => {
     settings.push({
-      [select.name]: select.value
+      [select.name]: select.value,
+      type: 'select'
     })
   })
+
+  const textareas = document.querySelectorAll('textarea')
+  ;[].forEach.call(textareas, area => {
+    const sites = area.value.split('\n')
+    if (sites.every(site => site.match(/([\w-]+\.){1,2}[\w]+/))) {
+      settings.push({
+        [area.name]: sites,
+        type: 'select'
+      })
+    } else {
+      return alert('屏蔽站点格式不正确')
+    }
+  })
+
   return settings
 }
 

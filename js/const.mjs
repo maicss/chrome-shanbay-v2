@@ -129,16 +129,18 @@ const shanbayAPI = {
  * @property {Array} enum - 取值范围
  * */
 const extensionSpecification = [
-  { 'clickLookup': true, desc: '双击选中查词', enum: [true, false] },
-  { 'contextLookup': true, desc: '右键查词', enum: [true, false] },
-  { 'addBook': false, desc: '默认添加到单词本', enum: [true, false] },
-  { 'alarm': true, desc: '定时提醒', enum: [true, false] },
-  { 'reminderContent': '少壮不努力，老大背单词', desc: '提示框内容', },
-  { 'autoRead': 'false', desc: '自动发音', enum: ['EN', 'US', 'false'] },
-  { 'paraphrase': 'bilingual', desc: '默认释义', enum: ['Chinese', 'English', 'bilingual'] },
-  { 'exampleSentence': true, desc: '显示例句按钮', enum: [true, false] },
-  { 'ignoreSites': [], desc: '忽略站点' },
+  { 'clickLookup': true, desc: '双击选中查词', enum: [true, false], type: 'radio' },
+  { 'contextLookup': true, desc: '右键查词', enum: [true, false], type: 'radio' },
+  { 'addBook': false, desc: '默认添加到单词本', enum: [true, false], type: 'radio' },
+  { 'alarm': true, desc: '定时提醒', enum: [true, false], type: 'radio' },
+  { 'reminderContent': '少壮不努力，老大背单词', desc: '提示框内容', type: 'text' },
+  { 'autoRead': 'false', desc: '自动发音', enum: ['EN', 'US', 'false'], type: 'select' },
+  { 'paraphrase': 'bilingual', desc: '默认释义', enum: ['Chinese', 'English', 'bilingual'], type: 'select' },
+  { 'exampleSentence': true, desc: '显示例句按钮', enum: [true, false], type: 'select' },
+  { 'ignoreSites': ['a.com', 'b.com'], desc: '忽略站点', type: 'textarea' },
 ]
+
+export const defaultIgnoreSites = ['shanbay.com', 'hjenglish.com', 'codepen.io', 'jsfiddle.net', 'jsbin.com', 'codesandbox.io', 'github1s.com']
 /**
  * 由extensionSpecification去除描述和取值范围之后生成的真正能使用的数组
  * a array of {settingName: value}

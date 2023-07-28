@@ -1,7 +1,7 @@
 import {
   debugLogger, storageSettingMap, request, lookUp, checkWordAdded,
   addOrForget, getWordExampleSentence, 
-} from './const.js'
+} from './const.mjs'
 
 
 /**
@@ -10,12 +10,16 @@ import {
  * @param {number} volume - volume of the playback
  */
 async function createOffscreen() {
-  if (await chrome.offscreen.hasDocument()) return;
-  await chrome.offscreen.createDocument({
-      url: 'offscreen.html',
-      reasons: ['AUDIO_PLAYBACK'],
-      justification: 'testing'
-  });
+  return chrome.offscreen.hasDocument()
+    .then(flag => {
+      if (!flag) {
+        return chrome.offscreen.createDocument({
+            url: 'offscreen.html',
+            reasons: ['AUDIO_PLAYBACK'],
+            justification: 'testing'
+        })
+      }
+    })
 }
 
 const storage = {}
@@ -23,9 +27,7 @@ const storage = {}
 const playSound = url => {
   request(url, {type: 'buffer'}).then(r => {
     createOffscreen().then(()=>{
-      let action = 'playSound';
-      const target = 'offscreen';
-      chrome.runtime.sendMessage({action, target, url}).then(()=>{
+      chrome.runtime.sendMessage({action: 'playSound', target: 'offscreen', url}).then(()=>{
         debugLogger('log', "background.js send message!")
       })
     })

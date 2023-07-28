@@ -6,16 +6,20 @@
     <style type="text/css">
         body {
             font-family: "PingFangSC-Light", "Helvetica Neue", Helvetica, "Microsoft YaHei", "微软雅黑", Arial, SimHei, serif;
+            margin: 0;
+            text-align: center;
+            word-break: keep-all;
+            padding: 5px 10px 16px;
         }
         ul {
             padding: 0;
+            margin: 0;
         }
 
         li {
             list-style-type: none;
             white-space: nowrap;
             margin: 10px 0;
-            text-align: center;
         }
 
         button {
@@ -30,10 +34,6 @@
             outline: none;
             cursor: pointer;
         }
-        /*#header {*/
-            /*cursor: pointer;*/
-            /*text-align: center;*/
-        /*}*/
         #header img {
             width: 40px;
             height:40px;
@@ -43,16 +43,12 @@
         .hide {
             display: none;
         }
-        a {
-            outline: none;
-            text-decoration: none;
-            color: white;
-        }
 
     </style>
 </head>
 <body>
 <div>
+    <h2>扇贝查词插件</h2>
     <ul>
         <li><button id="batch-add" class="hide">批量添加单词</button></li>
         <li><button id="begin-learning" class="hide">开始背单词</button></li>
@@ -62,6 +58,6 @@
     </ul>
 </div>
 </body>
-<script type="module" src="js/const.js" charset="UTF-8"></script>
-<script type="text/javascript" src="js/popup.js" charset="UTF-8"></script>
+<script type="module" src="js/const.mjs" charset="UTF-8"></script>
+<script type="module" src="js/popup.mjs" charset="UTF-8"></script>
 </html>
