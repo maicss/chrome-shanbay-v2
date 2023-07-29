@@ -46,7 +46,7 @@ chrome.storage.onChanged.addListener(function (changes) {
 const pendingSearchSelection = (event) => {
 
     if (defaultIgnoreSites.some(site => location.hostname.includes(site))) return
-    if (storage.ignoreSites.some(site => location.hostname.includes(site))) return
+    if (storage.ignoreSites && storage.ignoreSites.some(site => location.hostname.includes(site))) return
 
     const _popover = document.querySelector('#__shanbay-popover')
     if (_popover) return
