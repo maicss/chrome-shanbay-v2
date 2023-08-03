@@ -130,9 +130,9 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
         contexts: ['selection'],
       })
       chrome.contextMenus.onClicked.addListener((info, tab) => {
-        lookUp(info.selectionText).then(res => {
-          chrome.tabs.sendMessage(tab.id, {action: 'lookup', data: res})
-        })
+        lookUp(info.selectionText)
+        .then(res => checkWordAdded(res.id).then(existsRes => {res.exists = existsRes.objects[0].exists; return res}))
+        .then(res => chrome.tabs.sendMessage(tab.id, {action: 'lookup', data: res}))
       })
     }
   })
