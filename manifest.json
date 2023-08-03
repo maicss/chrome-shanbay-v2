@@ -1,6 +1,6 @@
 {
   "name": "扇贝助手v2",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "author": "maicss, jinntrance",
   "manifest_version": 3,
   "description": "基于shanbay网页API查询并加入单词到生词本的应用",
