@@ -52,7 +52,6 @@ input[type='text'] {
   border-radius: 3px;
   border: 1px solid #666;
   outline: none;
-  cursor: pointer;
 }
 
 #saveRes {

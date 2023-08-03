@@ -79,13 +79,14 @@ const getOptions = () => {
   const textareas = document.querySelectorAll('textarea')
   ;[].forEach.call(textareas, area => {
     const sites = area.value.split('\n')
-    if (sites.every(site => site.match(/([\w-]+\.){1,2}[\w]+/))) {
+    if (sites.every(site => site.match(/^([\w-]+\.){1,2}[\w]+$/))) {
       settings.push({
         [area.name]: sites,
-        type: 'select'
+        type: 'textarea'
       })
     } else {
-      return alert('屏蔽站点格式不正确')
+      alert('屏蔽站点格式不正确')
+      throw new Error('屏蔽站点格式不正确')
     }
   })
 
@@ -104,19 +105,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
   document.querySelector('#save').onclick = function () {
-    this.disabled = true
-    let _settings = getOptions()
-    chrome.storage.sync.set({__shanbayExtensionSettings: _settings}, () => {
-      console.log('lastError in options js: ', chrome.runtime.lastError)
-      if (!chrome.runtime.lastError) {
-        const saveRes = document.querySelector('#saveRes')
-        saveRes.className = ''
-        setTimeout(function () {
-          saveRes.className = 'hide'
-          this.disabled = false
-        }, 1000)
-      }
-      debugLogger('log', '__shanbayExtensionSettings settled.')
-    })
+    try {
+      const _settings = getOptions()
+      this.disabled = true
+      chrome.storage.sync.set({__shanbayExtensionSettings: _settings}, () => {
+        console.log('lastError in options js: ', chrome.runtime.lastError)
+        if (!chrome.runtime.lastError) {
+          const saveRes = document.querySelector('#saveRes')
+          saveRes.className = ''
+          setTimeout( () => {
+            saveRes.className = 'hide'
+            this.disabled = false
+          }, 1000)
+        }
+        debugLogger('log', '__shanbayExtensionSettings settled.')
+      })
+    } catch (e) {
+
+    }
   }
 })

@@ -1,6 +1,6 @@
 import {
   debugLogger, storageSettingMap, request, lookUp, checkWordAdded,
-  addOrForget, getWordExampleSentence, 
+  addOrForget, getWordExampleSentence, getDailyTaskCount, defaultIgnoreSites
 } from './const.mjs'
 
 
@@ -82,15 +82,14 @@ const getDailyTask = () => {
     chrome.alarms.onAlarm.addListener(() => {
       if (!storage.alarm) return chrome.alarms.clear(reminderName)
       debugLogger('log', 'send daily task request')
-      request('https://www.shanbay.com/api/v1/bdc/stats/today/').then(r => {
-
-        if (r.data.num_left === 0) {
+      getDailyTaskCount().then(r => {
+        if (r.total === 0) {
           chrome.action.setBadgeText({text: ''})
         } else {
-          chrome.action.setBadgeText({text: r.data.num_left + ''})
+          chrome.action.setBadgeText({text: r.total + ''})
           notify({
-            message: `今天还有${r.data.num_left}个单词需要复习`,
-            url: 'https://www.shanbay.com/bdc/review/'
+            message: `今天还有${r.total}个单词需要复习`,
+            url: 'https://web.shanbay.com/wordsweb/#/collection'
           })
         }
       }).catch(e => debugLogger('error', 'get daily task failed, cause: ', e))
@@ -121,25 +120,21 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
 
   // contentMenu
   chrome.contextMenus.removeAll(function () {
-    chrome.tabs.query({ active: true })
-    .then(tabs => {
-      const curUrl = tabs[0].url
-      if (storage.ignoreSites.some(site => curUrl.includes(site))) return
-      if (storage.contextLookup) {
-        debugLogger('info', 'contextMenu added')
-        chrome.contextMenus.create({
-          id: Math.random().toString(36),
-          title: '在扇贝网中查找 %s',
-          contexts: ['selection'],
+    if (defaultIgnoreSites.some(site => location.hostname.includes(site))) return
+    if (storage.ignoreSites.some(site => location.hostname.includes(site))) return
+    if (storage.contextLookup) {
+      debugLogger('info', 'contextMenu added')
+      chrome.contextMenus.create({
+        id: Math.random().toString(36),
+        title: '在扇贝网中查找 %s',
+        contexts: ['selection'],
+      })
+      chrome.contextMenus.onClicked.addListener((info, tab) => {
+        lookUp(info.selectionText).then(res => {
+          chrome.tabs.sendMessage(tab.id, {action: 'lookup', data: res})
         })
-        chrome.contextMenus.onClicked.addListener((info, tab) => {
-          lookUp(info.selectionText).then(res => {
-            chrome.tabs.sendMessage(tab.id, {action: 'lookup', data: res})
-          })
-        })
-      }
-    })
-    .catch()
+      })
+    }
   })
   getDailyTask()
 })

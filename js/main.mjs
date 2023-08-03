@@ -96,7 +96,11 @@ const popover = (res) => {
     /** 查询之前和未登录的提示信息*/
     document.querySelector('#__shanbay-popover #shanbay-title').innerHTML = res.msg
   } else if (res.data.msg) {
-    document.querySelector('#__shanbay-popover #shanbay-inner').innerHTML = `<div id="shanbay-title" class="has-error" style="border: none;">${res.data.msg}</div>`
+    document.querySelector('#__shanbay-popover #shanbay-inner').innerHTML = `
+    <div id="shanbay-title" class="has-error">
+      <div class="error-message">${res.data.msg}</div>
+      ${[400, 401, 403].includes(res.data.status) ? '<div class="login"><a href="https://web.shanbay.com/web/account/login/" target="_blank" class="shanbay-btn">去登录</a></div>' : ''}
+    </div>`
   } else {
     /** 查询单词或者单词其他操作成功*/
     let data = res.data
@@ -125,11 +129,11 @@ const popover = (res) => {
       </div>
       <div id="shanbay-content">
           <div class="simple-definition">
-              ${storage.paraphrase !== 'English' ? (data.definitions.cn.length ? `<div><strong>中文：</strong> ${data.definitions.cn.map(p => `<div><span>${p.pos} </span><span>${p.def}</span></div>`).join('')}</div>`: '') : ''}
-              ${ storage.paraphrase !== 'Chinese' ? (data.definitions.en.length ? `<div><strong>英文：</strong>${data.definitions.en.map(p => `<div><span>${p.pos} </span><span>${p.def}</span></div>`).join('')}</div>`: '') : ''}
+              ${storage.paraphrase !== 'English' ? (data.definitions.cn.length ? `<div><b>中文：</b> ${data.definitions.cn.map(p => `<div><span style="color: #333">${p.pos} </span><span>${p.def}</span></div>`).join('')}</div>`: '') : ''}
+              ${ storage.paraphrase !== 'Chinese' ? (data.definitions.en.length ? `<div><b>英文：</b>${data.definitions.en.map(p => `<div><span style="color: #333">${p.pos} </span><span>${p.def}</span></div>`).join('')}</div>`: '') : ''}
           </div>
           <div id="shanbay-example-sentence-div" class="hide"></div>
-          <div id="footer">
+          <div id="shanbay-footer">
             <span id="shanbay-example-sentence-span"><button id="shanbay-example-sentence-btn" class="shanbay-btn">查看例句</button></span>
             ${data.exists === 'error' ? '' : `<span id="shanbay-add-word-span"><button id="shanbay-add-word-btn" class="shanbay-btn ${data.exists ? 'forget' : ''}">${data.exists ? '我忘了' : '添加'}</button></span>`}
           </div>
@@ -192,7 +196,7 @@ chrome.runtime.onMessage.addListener(function (res, sender) {
       }
       break
     case 'getWordExample':
-      exampleSentenceDiv.innerHTML = res.data.map((item, index) => `<p>${index + 1}, ${item.content_en} <span class="speaker" data-target="${item.audio.us.urls[0]}"></span></p><p>  ${item.content_cn}</p>`).join('')
+      exampleSentenceDiv.innerHTML = res.data.map((item, index) => `<p>${index + 1}, ${item.content_en.replaceAll('vocab', 'b')} <span class="speaker" data-target="${item.audio.us.urls[0]}"></span></p><p>  ${item.content_cn}</p>`).join('')
       exampleSentenceDiv.className = 'simple-definition'
       exampleSentenceSpan.innerHTML = ''
       Array.from(exampleSentenceDiv.querySelectorAll('.speaker')).forEach(dom => {
