@@ -310,7 +310,7 @@ export const notify = (opt = {title: '人丑多读书', message: '少壮不努�
  * @return Promise
  * */
 export const request = (url, options = {}) => {
-  return fetch(url, Object.assign(options, { credentials: "include" }))
+  return fetch(url, Object.assign(options, { credentials: "include", mode: 'cors' }))
     .then((res) => {
       if (res.ok) {
         if (options.type === "buffer") return res.arrayBuffer();

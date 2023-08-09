@@ -42,7 +42,16 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
       lookUp(req.word)
         .then(res => checkWordAdded(res.id).then(existsRes => {res.exists = existsRes.objects[0].exists; return res}))
         .then(data => chrome.tabs.sendMessage(sender.tab.id, {action: 'lookup', data}))
-        .catch(data => chrome.tabs.sendMessage(sender.tab.id, {action: 'lookup', data}))
+        .catch(data => {
+          let error = {}
+          if (data.message === 'Failed to fetch') {
+            error.status = 400
+            error.msg = '请求失败，请登录后刷新本页面'
+          } else {
+            error = data
+          }
+          chrome.tabs.sendMessage(sender.tab.id, {action: 'lookup', data: error})
+        })
       break
     case 'addOrForget':
       addOrForget(req.word, req.wordID).then(res => {
