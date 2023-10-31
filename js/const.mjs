@@ -374,9 +374,9 @@ const extensionSpecification = [
   {addBook: false, desc: "默认添加到单词本", enum: [true, false], type: "radio"},
   {alarm: true, desc: "定时提醒", enum: [true, false], type: "radio"},
   {reminderContent: '少壮不努力，老大背单词', desc: '提示框内容', type: 'text'},
-  {autoRead: "false", desc: "自动发音", enum: ["EN", "US", "false"], type: "select"},
+  {autoRead: "false", desc: "自动发音", enum: ["en", "us", "false"], type: "select"},
   {paraphrase: "bilingual", desc: "默认释义", enum: ["Chinese", "English", "bilingual"], type: "select"},
-  {exampleSentence: true, desc: "显示例句按钮", enum: [true, false], type: "select"},
+  {exampleSentence: true, desc: "显示例句按钮", enum: [true, false], type: "radio"},
   { ignoreSites: [], desc: "忽略站点", type: "textarea" },
 ];
 // 默认屏蔽的网站

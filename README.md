@@ -2,8 +2,6 @@
 
 > shanbay chrome 网页查单词插件
 
-是 [jinntrance/shanbay-crx](https://github.com/jinntrance/shanbay-crx) 的重构版
-
 Chrome 商店地址：https://chrome.google.com/webstore/detail/%E6%89%87%E8%B4%9D%E5%8A%A9%E6%89%8Bv2/pkibohmmnmpgbnaoappgndlfncanookc
 
 

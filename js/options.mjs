@@ -78,15 +78,17 @@ const getOptions = () => {
 
   const textareas = document.querySelectorAll('textarea')
   ;[].forEach.call(textareas, area => {
-    const sites = area.value.split('\n')
-    if (sites.every(site => site.match(/^([\w-]+\.){1,2}[\w]+$/))) {
-      settings.push({
-        [area.name]: sites,
-        type: 'textarea'
-      })
-    } else {
-      alert('屏蔽站点格式不正确')
-      throw new Error('屏蔽站点格式不正确')
+    if(area.value.trim()) {
+      const sites = area.value.split('\n')
+      if (sites.every(site => site.trim().match(/^([\w-]+\.){1,2}[\w]+$/))) {
+        settings.push({
+          [area.name]: sites.trim(),
+          type: 'textarea'
+        })
+      } else {
+        alert('屏蔽站点格式不正确')
+        throw new Error('屏蔽站点格式不正确')
+      }
     }
   })
 
@@ -114,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
           const saveRes = document.querySelector('#saveRes')
           saveRes.className = ''
           setTimeout( () => {
-            saveRes.className = 'hide'
+            saveRes.className = 'height-0'
             this.disabled = false
           }, 1000)
         }

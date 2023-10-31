@@ -110,13 +110,13 @@ const popover = (res) => {
       if (data.audios[0].uk ) {
         str += '<div>'
         str += `<span>uk: </span><small>/${data.audios[0].uk.ipa}/</small> `
-        if (data.audios[0].uk.urls.length) str += `<span class="speaker" data-target="${data.audios[0].uk.urls[0]}"></span> `
+        if (data.audios[0].uk.urls.length) str += `<span class="speaker uk" data-target="${data.audios[0].uk.urls[0]}"></span> `
         str += '</div>'
       }
       if (data.audios[0].us ) {
         str += '<div>'
         str += `<span>us: </span><small>/${data.audios[0].us.ipa}/</small> `
-        if (data.audios[0].us.urls.length) str += `<span class="speaker" data-target="${data.audios[0].us.urls[0]}"></span> `
+        if (data.audios[0].us.urls.length) str += `<span class="speaker us" data-target="${data.audios[0].us.urls[0]}"></span> `
         str += '</div>'
       }
       return str
@@ -134,7 +134,7 @@ const popover = (res) => {
           </div>
           <div id="shanbay-example-sentence-div" class="hide"></div>
           <div id="shanbay-footer">
-            <span id="shanbay-example-sentence-span"><button id="shanbay-example-sentence-btn" class="shanbay-btn">查看例句</button></span>
+            <span id="shanbay-example-sentence-span" class="hide"><button id="shanbay-example-sentence-btn" class="shanbay-btn">查看例句</button></span>
             ${data.exists === 'error' ? '' : `<span id="shanbay-add-word-span"><button id="shanbay-add-word-btn" class="shanbay-btn ${data.exists ? 'forget' : ''}">${data.exists ? '我忘了' : '添加'}</button></span>`}
           </div>
       </div>
@@ -144,10 +144,14 @@ const popover = (res) => {
     /** 各种事件的处理*/
     /** 发音事件的处理 */
     Array.from(document.querySelectorAll('#__shanbay-popover .speaker')).forEach((speaker) => {
+      if (speaker.classList.contains(data.__shanbayExtensionSettings.autoRead)) {
+        chrome.runtime.sendMessage({action: 'playSound', url: speaker.dataset.target})
+      }
       speaker.addEventListener('click', function () {
         chrome.runtime.sendMessage({action: 'playSound', url: this.dataset.target})
       })
     })
+
     const exampleSentenceBtn = document.querySelector('#shanbay-example-sentence-btn')
     const exampleSentenceSpan = document.querySelector('#shanbay-example-sentence-span')
 
@@ -168,9 +172,8 @@ const popover = (res) => {
       }
     }
 
-    if (!storage.exampleSentence) {
-      exampleSentenceSpan.interHtml = ''
-    } else {
+    if (storage.exampleSentence) {
+      exampleSentenceSpan.classList.remove('hide')
       exampleSentenceBtn.addEventListener('click', () => {
         chrome.runtime.sendMessage({action: 'getWordExample', id: data.id})
       })

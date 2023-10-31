@@ -1,10 +1,18 @@
+body {
+  font-size: unset;
+  font-family: -apple-system,BlinkMacSystemFont,San Francisco,Segoe UI,Roboto,Helvetica Neue,sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 0;
+}
 #main {
   width: 666px;
   margin: 20px auto;
   background-color: #f2f2f2;
   padding: 30px;
-  box-shadow: 10px 10px 13px 11px #d4d4d4;
+  box-shadow: 4px 4px 20px 6px #d4d4d4;
   border-radius: 6px;
+  position: relative;
 }
 
 header h1 {
@@ -55,7 +63,28 @@ input[type='text'] {
 }
 
 #saveRes {
+  position: absolute;
+  border-radius: 6px 6px 0 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  max-height: 58px;
+  overflow: hidden;
   text-align: center;
+  transition: max-height 0.3s ease-out;
+}
+
+#saveRes.height-0 {
+  max-height: 0;
+}
+#saveRes p {
+  padding: 15px 0;
+  background-color: #b6e6a6;
+}
+#saveRes p {
+  text-align: center;
+  margin: 0;
+
   font-size: 20px;
   color: #1c544c;
 }

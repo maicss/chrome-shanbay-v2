@@ -12,6 +12,11 @@
         <h1>扇贝助手设置</h1>
     </header>
     <hr>
+    <div id="saveRes" class="height-0">
+        <div>
+            <p>保存成功</p>
+        </div>
+    </div>
     <ul>
         <li>
             <h3>1, 双击查词</h3>
@@ -39,6 +44,15 @@
             </p>
         </li>
         <li>
+            <h3>显示例句按钮</h3>
+            <p>
+                <label>
+                    <input type="radio" name="exampleSentence" value="true">是
+                    <input type="radio" name="exampleSentence" value="false" checked>否
+                </label>
+            </p>
+        </li>
+        <li>
             <h3>开启背单词定时提醒(每3小时)<i>请注意操作系统是不是关闭了浏览器的通知</i></h3>
             <p>
                 <label>
@@ -52,8 +66,8 @@
             <h3>默认发音</h3>
             <p class="select">
                 <select name="autoRead">
-                    <option value="US">美音</option>
-                    <option value="EN">英音</option>
+                    <option value="us">美音</option>
+                    <option value="en">英音</option>
                     <option selected value="false">关闭</option>
                 </select>
             </p>
@@ -65,15 +79,6 @@
                     <option value="Chinese">只显示中文释义</option>
                     <option value="English">只显示英文释义</option>
                     <option selected value="bilingual">显示双语释义</option>
-                </select>
-            </p>
-        </li>
-        <li>
-            <h3>显示例句按钮</h3>
-            <p class="select">
-                <select name="exampleSentence">
-                    <option value="true">是</option>
-                    <option value="false">否</option>
                 </select>
             </p>
         </li>
@@ -91,7 +96,6 @@
 
     <div id="saveP">
         <button id="save">保存</button>
-        <p id="saveRes" class="hide">保存成功</p>
     </div>
 
     <hr>

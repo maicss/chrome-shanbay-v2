@@ -41,7 +41,10 @@ chrome.runtime.onMessage.addListener(function (req, sender, sendResponse) {
     case 'lookup':
       lookUp(req.word)
         .then(res => checkWordAdded(res.id).then(existsRes => {res.exists = existsRes.objects[0].exists; return res}))
-        .then(data => chrome.tabs.sendMessage(sender.tab.id, {action: 'lookup', data}))
+        .then(data => {
+          data.__shanbayExtensionSettings = {autoRead: storage.autoRead}
+          chrome.tabs.sendMessage(sender.tab.id, {action: 'lookup', data})
+        })
         .catch(data => {
           let error = {}
           if (data.message === 'Failed to fetch') {
@@ -130,7 +133,7 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
   // contentMenu
   chrome.contextMenus.removeAll(function () {
     if (defaultIgnoreSites.some(site => location.hostname.includes(site))) return
-    if (storage.ignoreSites.some(site => location.hostname.includes(site))) return
+    if (storage.ignoreSites && storage.ignoreSites.some(site => location.hostname.includes(site))) return
     if (storage.contextLookup) {
       debugLogger('info', 'contextMenu added')
       chrome.contextMenus.create({
