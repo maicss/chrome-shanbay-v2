@@ -145,8 +145,8 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
         lookUp(info.selectionText)
         .then(res => checkWordAdded(res.id).then(existsRes => {res.exists = existsRes.objects[0].exists; return res}))
         .then(res => {
-            data.__shanbayExtensionSettings = {autoRead: storage.autoRead}
-            chrome.tabs.sendMessage(tab.id, {action: 'lookup', data: res})
+          res.__shanbayExtensionSettings = {autoRead: storage.autoRead}
+          chrome.tabs.sendMessage(tab.id, {action: 'lookup', data: res})
           })
         .catch(data => chrome.tabs.sendMessage(tab.id, {action: 'lookup', data}))
       })
