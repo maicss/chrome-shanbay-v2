@@ -11,6 +11,11 @@
     "service_worker": "js/background.js",
     "type": "module"
   },
+  "commands": {
+    "look-up-in-shanbay": {
+      "description": "Look up a word in shanbay"
+    }
+  },
   "action": {
     "default_icon": "images/icon_48.png",
     "default_popup": "popup.html",
@@ -31,8 +36,8 @@
       ],
       "matches": ["<all_urls>"],
       "exclude_matches": [
-        "*://*.shanbay.com/*", 
-        "*://*.hjenglish.com/*", 
+        "*://*.shanbay.com/*",
+        "*://*.hjenglish.com/*",
         "*://*.codepen.io/*",
         "*://*.jsfiddle.net/*",
         "*://*.jsbin.com/*",
@@ -51,6 +56,8 @@
     "storage",
     "alarms",
     "notifications",
-    "offscreen"
+    "offscreen",
+    "scripting",
+    "activeTab"
   ]
 }
