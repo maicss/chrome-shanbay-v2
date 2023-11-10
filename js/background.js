@@ -114,7 +114,7 @@ const getDailyTask = () => {
 /**
  * 根据网页上选择的文本进行查询
  */
-const LookUpBySelection = async (tabId) => {
+const lookUpBySelection = async (tabId) => {
   try {
     // 获取网页中选择的文本
     const [{result}] = await chrome.scripting.executeScript({
@@ -182,7 +182,7 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
 chrome.commands.onCommand.addListener(async (command, tab) => {
   switch (command) {
     case "look-up-in-shanbay":
-      LookUpBySelection(tab.id);
+      lookUpBySelection(tab.id);
       break;
 
     default:
