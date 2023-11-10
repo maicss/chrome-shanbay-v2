@@ -111,6 +111,30 @@ const getDailyTask = () => {
   }
 }
 
+/**
+ * 根据网页上选择的文本进行查询
+ */
+const lookUpBySelection = async (tabId) => {
+  try {
+    // 获取网页中选择的文本
+    const [{result}] = await chrome.scripting.executeScript({
+      target: {tabId: tabId},
+      func: () => getSelection().toString(),
+    });
+
+    // 查询单词
+    const res = await lookUp(result);
+    const existsRes = await checkWordAdded(res.id);
+    res.exists = existsRes.objects[0].exists;
+    res.__shanbayExtensionSettings = {autoRead: storage.autoRead};
+
+    // 发送事件，弹窗
+    chrome.tabs.sendMessage(tabId, {action: 'lookup', data: res});
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 chrome.storage.onChanged.addListener(changes => {
   const settings = changes.__shanbayExtensionSettings.newValue
   if (Object.keys(settings).length) {
@@ -154,3 +178,14 @@ chrome.storage.sync.get('__shanbayExtensionSettings', (settings) => {
   })
   getDailyTask()
 })
+
+chrome.commands.onCommand.addListener(async (command, tab) => {
+  switch (command) {
+    case "look-up-in-shanbay":
+      lookUpBySelection(tab.id);
+      break;
+
+    default:
+      break;
+  }
+});
